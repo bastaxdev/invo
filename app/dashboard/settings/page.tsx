@@ -17,8 +17,9 @@ import {
 export default async function SettingsPage({
   searchParams,
 }: {
-  searchParams: { error?: string; success?: string }
+  searchParams: Promise<{ error?: string; success?: string }>
 }) {
+  const params = await searchParams
   const supabase = await createClient()
 
   const {
@@ -45,13 +46,13 @@ export default async function SettingsPage({
         </p>
       </div>
 
-      {searchParams.error && (
+      {params.error && (
         <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
-          {searchParams.error}
+          {params.error}
         </div>
       )}
 
-      {searchParams.success && (
+      {params.success && (
         <div className="mb-4 rounded-md bg-green-50 p-3 text-sm text-green-800">
           Profile updated successfully!
         </div>

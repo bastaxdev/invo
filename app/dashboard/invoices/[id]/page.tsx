@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { GeneratePDFButton } from '@/components/invoices/generate-pdf-button'
 import { SendEmailDialog } from '@/components/invoices/send-email-dialog'
+import { UpdateStatusDialog } from '@/components/invoices/update-status-dialog'
+import { StatusBadge } from '@/components/invoices/status-badge'
 
 export default async function InvoiceViewPage({
   params,
@@ -62,7 +64,7 @@ export default async function InvoiceViewPage({
         <h1 className="text-3xl font-bold text-slate-900 mb-4">
           Invoice Details
         </h1>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <GeneratePDFButton
             invoice={invoice}
             invoiceItems={invoiceItems || undefined}
@@ -72,6 +74,10 @@ export default async function InvoiceViewPage({
           <SendEmailDialog
             invoiceId={invoice.id}
             invoiceNumber={invoice.invoice_number}
+          />
+          <UpdateStatusDialog
+            invoiceId={invoice.id}
+            currentStatus={invoice.status}
           />
         </div>
       </div>
@@ -105,6 +111,12 @@ export default async function InvoiceViewPage({
                 })}{' '}
                 {invoice.currency}
               </p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-500">Status</p>
+              <div className="mt-1">
+                <StatusBadge status={invoice.status} />
+              </div>
             </div>
           </CardContent>
         </Card>

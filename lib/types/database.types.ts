@@ -50,7 +50,7 @@ export interface Database {
           description: string
           amount: number
           currency: string
-          mode: string
+          status: string
           created_at: string
           updated_at: string
         }
@@ -64,7 +64,7 @@ export interface Database {
           description: string
           amount: number
           currency?: string
-          mode?: string
+          status?: string
           created_at?: string
           updated_at?: string
         }
@@ -78,7 +78,7 @@ export interface Database {
           description?: string
           amount?: number
           currency?: string
-          mode?: string
+          status?: string
           created_at?: string
           updated_at?: string
         }
@@ -151,6 +151,70 @@ export interface Database {
           bank_account?: string | null
           created_at?: string
           updated_at?: string
+        }
+      }
+      invoice_templates: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          description: string | null
+          currency: string
+          default_due_days: number
+          is_default: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          description?: string | null
+          currency?: string
+          default_due_days?: number
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          description?: string | null
+          currency?: string
+          default_due_days?: number
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      template_items: {
+        Row: {
+          id: string
+          template_id: string
+          description: string
+          quantity: number
+          unit_price: number
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          template_id: string
+          description: string
+          quantity?: number
+          unit_price: number
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          template_id?: string
+          description?: string
+          quantity?: number
+          unit_price?: number
+          sort_order?: number
+          created_at?: string
         }
       }
     }

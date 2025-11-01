@@ -12,12 +12,14 @@ import {
 } from '@/components/ui/table'
 import Link from 'next/link'
 import { DeleteInvoiceButton } from '@/components/invoices/delete-invoice-button'
+import { StatusBadge } from '@/components/invoices/status-badge'
 
 export default async function InvoicesPage({
   searchParams,
 }: {
-  searchParams: { error?: string }
+  searchParams: Promise<{ error?: string }>
 }) {
+  const params = await searchParams
   const supabase = await createClient()
 
   const {
@@ -52,9 +54,9 @@ export default async function InvoicesPage({
         </Link>
       </div>
 
-      {searchParams.error && (
+      {params.error && (
         <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
-          {searchParams.error}
+          {params.error}
         </div>
       )}
 
@@ -74,6 +76,7 @@ export default async function InvoicesPage({
                   <TableHead>Client</TableHead>
                   <TableHead>Issue Date</TableHead>
                   <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -93,6 +96,9 @@ export default async function InvoicesPage({
                         maximumFractionDigits: 2,
                       })}{' '}
                       {invoice.currency}
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={invoice.status} />
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

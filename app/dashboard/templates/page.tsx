@@ -17,8 +17,9 @@ import { DeleteTemplateButton } from '@/components/templates/delete-template-but
 export default async function TemplatesPage({
   searchParams,
 }: {
-  searchParams: { error?: string }
+  searchParams: Promise<{ error?: string }>
 }) {
+  const params = await searchParams
   const supabase = await createClient()
 
   const {
@@ -50,9 +51,9 @@ export default async function TemplatesPage({
         </Link>
       </div>
 
-      {searchParams.error && (
+      {params.error && (
         <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
-          {searchParams.error}
+          {params.error}
         </div>
       )}
 

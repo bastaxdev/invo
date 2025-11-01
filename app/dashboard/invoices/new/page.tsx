@@ -10,12 +10,14 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { InvoiceFormSimplified } from '@/components/invoices/invoice-form-simplified'
+import { ProfileGuard } from '@/components/layout/profile-guard'
 
 export default async function NewInvoicePage({
   searchParams,
 }: {
-  searchParams: { error?: string }
+  searchParams: Promise<{ error?: string }>
 }) {
+  const params = await searchParams
   const supabase = await createSupabaseClient()
 
   const {
@@ -32,26 +34,28 @@ export default async function NewInvoicePage({
     .order('name')
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create Invoice</CardTitle>
-          <CardDescription>
-            Create a new invoice for your Norwegian client
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {searchParams.error && (
-            <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
-              {searchParams.error}
-            </div>
-          )}
-          <InvoiceFormSimplified
-            clients={clients || []}
-            action={createInvoice}
-          />
-        </CardContent>
-      </Card>
-    </div>
+    <ProfileGuard>
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Create Invoice</CardTitle>
+            <CardDescription>
+              Create a new invoice for your Norwegian client
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {params.error && (
+              <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+                {params.error}
+              </div>
+            )}
+            <InvoiceFormSimplified
+              clients={clients || []}
+              action={createInvoice}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </ProfileGuard>
   )
 }
