@@ -5,20 +5,6 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@/lib/supabase/server'
 
-function generateRandomPrefix(): string {
-  // Generate 3 random uppercase letters + 1 random digit
-  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  const digits = '0123456789'
-
-  let prefix = ''
-  for (let i = 0; i < 3; i++) {
-    prefix += letters.charAt(Math.floor(Math.random() * letters.length))
-  }
-  prefix += digits.charAt(Math.floor(Math.random() * digits.length))
-
-  return prefix
-}
-
 async function getUserPrefix(supabase: any, userId: string): Promise<string> {
   // Get user's custom prefix from profile
   const { data: profile } = await supabase
@@ -73,7 +59,27 @@ async function generateInvoiceNumber(
   return `${prefix}-${nextNumber.toString().padStart(3, '0')}`
 }
 
-// Update createInvoice to catch the error if no prefix is set:
+async function isInvoiceNumberUnique(
+  supabase: any,
+  userId: string,
+  invoiceNumber: string,
+  excludeInvoiceId?: string
+): Promise<boolean> {
+  let query = supabase
+    .from('invoices')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('invoice_number', invoiceNumber)
+
+  if (excludeInvoiceId) {
+    query = query.neq('id', excludeInvoiceId)
+  }
+
+  const { data } = await query
+
+  return !data || data.length === 0
+}
+
 export async function createInvoice(formData: FormData) {
   const supabase = await createSupabaseClient()
 
@@ -124,6 +130,7 @@ export async function createInvoice(formData: FormData) {
     redirect(
       '/dashboard/invoices/new?error=' + encodeURIComponent(error.message)
     )
+    return
   }
 
   // Handle invoice number
@@ -207,7 +214,6 @@ export async function createInvoice(formData: FormData) {
   redirect('/dashboard/invoices')
 }
 
-// Update updateInvoice similarly:
 export async function updateInvoice(id: string, formData: FormData) {
   const supabase = await createSupabaseClient()
 
@@ -228,6 +234,7 @@ export async function updateInvoice(id: string, formData: FormData) {
       `/dashboard/invoices/${id}/edit?error=` +
         encodeURIComponent(error.message)
     )
+    return
   }
 
   // Handle invoice number validation
@@ -299,7 +306,6 @@ export async function updateInvoice(id: string, formData: FormData) {
   redirect('/dashboard/invoices')
 }
 
-// Keep deleteInvoice as is
 export async function deleteInvoice(id: string) {
   const supabase = await createSupabaseClient()
 
