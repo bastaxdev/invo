@@ -17,6 +17,7 @@ import {
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
 import { Trash2, Plus } from 'lucide-react'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 interface TemplateItem {
   description: string
@@ -30,7 +31,6 @@ interface TemplateFormProps {
     description: string | null
     currency: string
     default_due_days: number
-    mode: string
     is_default: boolean
   }
   templateItems?: TemplateItem[]
@@ -42,9 +42,6 @@ export function TemplateForm({
   templateItems,
   action,
 }: TemplateFormProps) {
-  const [mode, setMode] = useState<'simple' | 'advanced'>(
-    (template?.mode as 'simple' | 'advanced') || 'simple'
-  )
   const [items, setItems] = useState<TemplateItem[]>(
     templateItems && templateItems.length > 0
       ? templateItems
@@ -76,7 +73,6 @@ export function TemplateForm({
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
 
-    formData.set('mode', mode)
     formData.set('items', JSON.stringify(items))
     if (isDefault) {
       formData.set('is_default', 'on')
@@ -159,58 +155,14 @@ export function TemplateForm({
         </div>
       </div>
 
-      {/* Mode Toggle */}
-      <div className="flex items-center justify-between rounded-lg border bg-slate-50 p-4">
-        <div>
-          <p className="font-medium">Template Mode</p>
-          <p className="text-sm text-slate-600">
-            {mode === 'simple'
-              ? 'Simple: One line item'
-              : 'Advanced: Multiple line items'}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant={mode === 'simple' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => {
-              if (mode === 'advanced' && items.length > 1) {
-                if (
-                  !confirm(
-                    'Switching to simple mode will keep only the first item. Continue?'
-                  )
-                ) {
-                  return
-                }
-                setItems([items[0]])
-              }
-              setMode('simple')
-            }}
-          >
-            Simple
-          </Button>
-          <Button
-            type="button"
-            variant={mode === 'advanced' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setMode('advanced')}
-          >
-            Advanced
-          </Button>
-        </div>
-      </div>
-
       {/* Line Items */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Label>Template Line Items</Label>
-          {mode === 'advanced' && (
-            <Button type="button" variant="outline" size="sm" onClick={addItem}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Item
-            </Button>
-          )}
+          <Button type="button" variant="outline" size="sm" onClick={addItem}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Item
+          </Button>
         </div>
 
         {items.map((item, index) => (
@@ -266,7 +218,7 @@ export function TemplateForm({
                 </div>
               </div>
 
-              {mode === 'advanced' && items.length > 1 && (
+              {items.length > 1 && (
                 <Button
                   type="button"
                   variant="destructive"

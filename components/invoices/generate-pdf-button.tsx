@@ -6,6 +6,15 @@ import { InvoicePDF } from './invoice-pdf'
 import { pdf } from '@react-pdf/renderer'
 import { useState } from 'react'
 import type { User } from '@supabase/supabase-js'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 interface InvoiceItem {
   description: string
@@ -22,7 +31,6 @@ interface GeneratePDFButtonProps {
     description: string
     amount: number
     currency: string
-    mode?: string
     clients: {
       name: string
       org_number: string
@@ -48,9 +56,11 @@ export function GeneratePDFButton({
   userProfile,
 }: GeneratePDFButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleGeneratePDF = async () => {
     setIsGenerating(true)
+    setError(null)
     try {
       const blob = await pdf(
         <InvoicePDF
@@ -66,17 +76,33 @@ export function GeneratePDFButton({
       link.download = `Invoice_${invoice.invoice_number}.pdf`
       link.click()
       URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error('Error generating PDF:', error)
-      alert('Failed to generate PDF. Please try again.')
+    } catch (err) {
+      console.error('Error generating PDF:', err)
+      setError('Failed to generate PDF. Please try again.')
     } finally {
       setIsGenerating(false)
     }
   }
 
   return (
-    <Button onClick={handleGeneratePDF} disabled={isGenerating} size="lg">
-      {isGenerating ? 'Generating PDF...' : '📄 Generate PDF'}
-    </Button>
+    <>
+      <Button onClick={handleGeneratePDF} disabled={isGenerating} size="lg">
+        {isGenerating ? 'Generating PDF...' : '📄 Generate PDF'}
+      </Button>
+
+      <AlertDialog open={!!error} onOpenChange={() => setError(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>PDF Generation Failed</AlertDialogTitle>
+            <AlertDialogDescription>{error}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setError(null)}>
+              Close
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }
