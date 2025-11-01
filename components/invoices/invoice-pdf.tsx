@@ -9,12 +9,25 @@ import {
   Font,
 } from '@react-pdf/renderer'
 
-// Register fonts (optional - using built-in Helvetica for now)
+// Register fonts that support Polish characters from CDN
+Font.register({
+  family: 'Roboto',
+  fonts: [
+    {
+      src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf',
+    },
+    {
+      src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-bold-webfont.ttf',
+      fontWeight: 'bold',
+    },
+  ],
+})
+
 const styles = StyleSheet.create({
   page: {
     padding: 40,
     fontSize: 10,
-    fontFamily: 'Helvetica',
+    fontFamily: 'Roboto',
   },
   header: {
     marginBottom: 30,
@@ -77,10 +90,18 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e5e7eb',
   },
   tableCol1: {
-    width: '70%',
+    width: '50%',
   },
   tableCol2: {
-    width: '30%',
+    width: '15%',
+    textAlign: 'right',
+  },
+  tableCol3: {
+    width: '17.5%',
+    textAlign: 'right',
+  },
+  tableCol4: {
+    width: '17.5%',
     textAlign: 'right',
   },
   total: {
@@ -131,7 +152,23 @@ const styles = StyleSheet.create({
     fontSize: 8,
     color: '#999',
   },
+  sellerSection: {
+    marginBottom: 20,
+  },
+  bankInfo: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#f9fafb',
+    borderRadius: 4,
+  },
 })
+
+interface InvoiceItem {
+  description: string
+  quantity: number
+  unit_price: number
+  amount: number
+}
 
 interface InvoicePDFProps {
   invoice: {
@@ -141,18 +178,45 @@ interface InvoicePDFProps {
     description: string
     amount: number
     currency: string
+    mode?: string
     clients: {
       name: string
       org_number: string
       address: string
     } | null
   }
+  invoiceItems?: InvoiceItem[]
   user: {
     email: string
   }
+  userProfile?: {
+    full_name: string | null
+    business_name: string | null
+    tax_id: string | null
+    address: string | null
+    phone: string | null
+    bank_account: string | null
+  } | null
 }
 
-export function InvoicePDF({ invoice, user }: InvoicePDFProps) {
+export function InvoicePDF({
+  invoice,
+  invoiceItems,
+  user,
+  userProfile,
+}: InvoicePDFProps) {
+  const items =
+    invoiceItems && invoiceItems.length > 0
+      ? invoiceItems
+      : [
+          {
+            description: invoice.description,
+            quantity: 1,
+            unit_price: invoice.amount,
+            amount: invoice.amount,
+          },
+        ]
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -174,7 +238,7 @@ export function InvoicePDF({ invoice, user }: InvoicePDFProps) {
             </Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Termin płatności / Due Date:</Text>
+            <Text style={styles.label}>Termin platnosci / Due Date:</Text>
             <Text style={styles.value}>
               {new Date(invoice.due_date).toLocaleDateString('pl-PL')} /{' '}
               {new Date(invoice.due_date).toLocaleDateString('en-GB')}
@@ -204,40 +268,82 @@ export function InvoicePDF({ invoice, user }: InvoicePDFProps) {
         <View style={styles.divider} />
 
         {/* Seller Info */}
-        <View style={styles.section}>
+        <View style={styles.sellerSection}>
           <Text style={styles.sectionTitle}>Sprzedawca / Seller</Text>
+          {userProfile?.business_name && (
+            <View style={styles.row}>
+              <Text style={styles.label}>Firma / Business:</Text>
+              <Text style={styles.value}>{userProfile.business_name}</Text>
+            </View>
+          )}
+          {userProfile?.full_name && (
+            <View style={styles.row}>
+              <Text style={styles.label}>Imie i nazwisko / Name:</Text>
+              <Text style={styles.value}>{userProfile.full_name}</Text>
+            </View>
+          )}
+          {userProfile?.tax_id && (
+            <View style={styles.row}>
+              <Text style={styles.label}>NIP / Tax ID:</Text>
+              <Text style={styles.value}>{userProfile.tax_id}</Text>
+            </View>
+          )}
+          {userProfile?.address && (
+            <View style={styles.row}>
+              <Text style={styles.label}>Adres / Address:</Text>
+              <Text style={styles.value}>{userProfile.address}</Text>
+            </View>
+          )}
+          {userProfile?.phone && (
+            <View style={styles.row}>
+              <Text style={styles.label}>Telefon / Phone:</Text>
+              <Text style={styles.value}>{userProfile.phone}</Text>
+            </View>
+          )}
           <View style={styles.row}>
             <Text style={styles.label}>Email:</Text>
             <Text style={styles.value}>{user.email}</Text>
           </View>
         </View>
 
+        {userProfile?.bank_account && (
+          <View style={styles.bankInfo}>
+            <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>
+              Dane do przelewu / Bank Details:
+            </Text>
+            <Text>{userProfile.bank_account}</Text>
+          </View>
+        )}
+
         <View style={styles.divider} />
 
-        {/* Services */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Usługi / Services</Text>
-          <View style={styles.description}>
-            <Text>{invoice.description}</Text>
-          </View>
-        </View>
-
-        {/* Table */}
+        {/* Line Items Table */}
         <View style={styles.table}>
+          <Text style={styles.sectionTitle}>Uslugi / Services</Text>
           <View style={styles.tableHeader}>
             <Text style={styles.tableCol1}>Opis / Description</Text>
-            <Text style={styles.tableCol2}>Kwota / Amount</Text>
+            <Text style={styles.tableCol2}>Ilosc / Qty</Text>
+            <Text style={styles.tableCol3}>Cena / Price</Text>
+            <Text style={styles.tableCol4}>Kwota / Amount</Text>
           </View>
-          <View style={styles.tableRow}>
-            <Text style={styles.tableCol1}>{invoice.description}</Text>
-            <Text style={styles.tableCol2}>
-              {invoice.amount.toLocaleString('nb-NO', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{' '}
-              {invoice.currency}
-            </Text>
-          </View>
+          {items.map((item, index) => (
+            <View key={index} style={styles.tableRow}>
+              <Text style={styles.tableCol1}>{item.description}</Text>
+              <Text style={styles.tableCol2}>{item.quantity}</Text>
+              <Text style={styles.tableCol3}>
+                {item.unit_price.toLocaleString('nb-NO', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </Text>
+              <Text style={styles.tableCol4}>
+                {item.amount.toLocaleString('nb-NO', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </Text>
+            </View>
+          ))}
         </View>
 
         {/* Total */}
@@ -272,21 +378,21 @@ export function InvoicePDF({ invoice, user }: InvoicePDFProps) {
         {/* Reverse Charge Notice - THE MAGIC */}
         <View style={styles.reverseCharge}>
           <Text style={styles.reverseChargeTitle}>
-            ⚠ ODWROTNE OBCIĄŻENIE MVA / REVERSE CHARGE VAT
+            ODWROTNE OBCIAZENIE MVA / REVERSE CHARGE VAT
           </Text>
           <Text style={styles.reverseChargeText}>
-            🇵🇱 POLSKI: Zgodnie z art. 28b ustawy o VAT, obowiązek rozliczenia
-            podatku VAT/MVA spoczywa na nabywcy usług (odwrotne obciążenie).
+            POLSKI: Zgodnie z art. 28b ustawy o VAT, obowiazek rozliczenia
+            podatku VAT/MVA spoczywa na nabywcy uslug (odwrotne obciazenie).
             Sprzedawca nie nalicza VAT.
           </Text>
           <Text style={styles.reverseChargeText}>
-            🇳🇴 NORWEGIAN: I henhold til norsk merverdiavgiftslov §11-3 (snudd
-            avregning / reverse charge), er kjøperen ansvarlig for å beregne og
+            NORWEGIAN: I henhold til norsk merverdiavgiftslov par.11-3 (snudd
+            avregning / reverse charge), er kjoperen ansvarlig for a beregne og
             rapportere MVA. Selgeren beregner ikke MVA.
           </Text>
           <Text style={styles.reverseChargeText}>
-            🇬🇧 ENGLISH: According to the reverse charge mechanism (Article 28b
-            VAT Act / Norwegian VAT Act §11-3), the buyer is responsible for
+            ENGLISH: According to the reverse charge mechanism (Article 28b VAT
+            Act / Norwegian VAT Act par.11-3), the buyer is responsible for
             accounting for VAT/MVA. The seller does not charge VAT.
           </Text>
         </View>
