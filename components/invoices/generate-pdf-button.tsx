@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { InvoicePDF } from './invoice-pdf'
 import { pdf } from '@react-pdf/renderer'
 import { useState } from 'react'
+import type { User } from '@supabase/supabase-js'
 
 interface GeneratePDFButtonProps {
   invoice: {
@@ -20,9 +21,7 @@ interface GeneratePDFButtonProps {
       address: string
     } | null
   }
-  user: {
-    email: string
-  }
+  user: User
 }
 
 export function GeneratePDFButton({ invoice, user }: GeneratePDFButtonProps) {
@@ -32,7 +31,10 @@ export function GeneratePDFButton({ invoice, user }: GeneratePDFButtonProps) {
     setIsGenerating(true)
     try {
       const blob = await pdf(
-        <InvoicePDF invoice={invoice} user={user} />
+        <InvoicePDF
+          invoice={invoice}
+          user={{ email: user.email || 'No email' }}
+        />
       ).toBlob()
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')

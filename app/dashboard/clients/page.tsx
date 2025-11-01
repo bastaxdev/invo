@@ -34,76 +34,63 @@ export default async function ClientsPage({
     .order('created_at', { ascending: false })
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Clients</h1>
-            <p className="mt-2 text-slate-600">Manage your Norwegian clients</p>
-          </div>
-          <Link href="/dashboard/clients/new">
-            <Button>Add Client</Button>
-          </Link>
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">Clients</h1>
+          <p className="mt-2 text-slate-600">Manage your Norwegian clients</p>
         </div>
+        <Link href="/dashboard/clients/new">
+          <Button>Add Client</Button>
+        </Link>
+      </div>
 
-        {searchParams.error && (
-          <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
-            {searchParams.error}
+      {searchParams.error && (
+        <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+          {searchParams.error}
+        </div>
+      )}
+
+      <div className="mt-8">
+        {!clients || clients.length === 0 ? (
+          <div className="rounded-lg border border-slate-200 bg-white p-12 text-center">
+            <p className="text-slate-500">
+              No clients yet. Add your first Norwegian client!
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-slate-200 bg-white">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Org. Number</TableHead>
+                  <TableHead>Address</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {clients.map((client) => (
+                  <TableRow key={client.id}>
+                    <TableCell className="font-medium">{client.name}</TableCell>
+                    <TableCell>{client.org_number}</TableCell>
+                    <TableCell>{client.address}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Link href={`/dashboard/clients/${client.id}/edit`}>
+                          <Button variant="outline" size="sm">
+                            Edit
+                          </Button>
+                        </Link>
+                        <DeleteClientButton id={client.id} name={client.name} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         )}
-
-        <div className="mt-8">
-          {!clients || clients.length === 0 ? (
-            <div className="rounded-lg border border-slate-200 bg-white p-12 text-center">
-              <p className="text-slate-500">
-                No clients yet. Add your first Norwegian client!
-              </p>
-            </div>
-          ) : (
-            <div className="rounded-lg border border-slate-200 bg-white">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Org. Number</TableHead>
-                    <TableHead>Address</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {clients.map((client) => (
-                    <TableRow key={client.id}>
-                      <TableCell className="font-medium">
-                        {client.name}
-                      </TableCell>
-                      <TableCell>{client.org_number}</TableCell>
-                      <TableCell>{client.address}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Link href={`/dashboard/clients/${client.id}/edit`}>
-                            <Button variant="outline" size="sm">
-                              Edit
-                            </Button>
-                          </Link>
-                          <DeleteClientButton
-                            id={client.id}
-                            name={client.name}
-                          />
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </div>
-
-        <div className="mt-8">
-          <Link href="/dashboard">
-            <Button variant="outline">← Back to Dashboard</Button>
-          </Link>
-        </div>
       </div>
     </div>
   )
