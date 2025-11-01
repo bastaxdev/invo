@@ -25,8 +25,9 @@ import Link from 'next/link'
 export default async function EditInvoicePage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params
   const supabase = await createSupabaseClient()
 
   const {
@@ -40,7 +41,7 @@ export default async function EditInvoicePage({
   const { data: invoice } = await supabase
     .from('invoices')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
@@ -53,7 +54,7 @@ export default async function EditInvoicePage({
     .select('*')
     .order('name')
 
-  const updateInvoiceWithId = updateInvoice.bind(null, params.id)
+  const updateInvoiceWithId = updateInvoice.bind(null, id)
 
   return (
     <div className="min-h-screen bg-slate-50">
