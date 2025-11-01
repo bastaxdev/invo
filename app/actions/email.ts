@@ -5,6 +5,7 @@ import { Resend } from 'resend'
 import { createClient as createSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { generateInvoicePDF } from '@/lib/pdf-generator'
+import { revalidatePath } from 'next/cache'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -201,6 +202,23 @@ export async function sendInvoiceEmail(
 
     if (error) {
       return { error: error.message }
+    }
+
+    // Auto-update status from draft to sent
+    if (invoice.status === 'draft') {
+      await supabase
+        .from('invoices')
+        .update({
+          status: 'sent',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', invoiceId)
+        .eq('user_id', user.id)
+
+      // Revalidate pages that show invoice status
+      revalidatePath('/dashboard/invoices')
+      revalidatePath('/dashboard/analytics')
+      revalidatePath(`/dashboard/invoices/${invoiceId}`)
     }
 
     return { success: true, messageId: data?.id }

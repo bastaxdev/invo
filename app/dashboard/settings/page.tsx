@@ -14,6 +14,13 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { LogoUpload } from '@/components/settings/logo-upload'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export default async function SettingsPage({
   searchParams,
@@ -162,6 +169,27 @@ export default async function SettingsPage({
                   <p className="text-xs text-slate-500">
                     2-6 characters, letters and numbers only. Used for invoice
                     numbers (e.g., INVO-001, INVO-002)
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="default_currency">
+                    Default Currency for Analytics
+                  </Label>
+                  <Select
+                    name="default_currency"
+                    defaultValue={profile?.default_currency || 'PLN'}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PLN">PLN (Polish Złoty)</SelectItem>
+                      <SelectItem value="NOK">NOK (Norwegian Krone)</SelectItem>
+                      <SelectItem value="EUR">EUR (Euro)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-slate-500">
+                    All analytics will be converted to this currency
                   </p>
                 </div>
               </div>

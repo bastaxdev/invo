@@ -72,6 +72,7 @@ export async function updateProfile(formData: FormData) {
     swift_bic: formData.get('swift_bic') as string,
     company_registration: formData.get('company_registration') as string,
     invoice_prefix: invoicePrefix,
+    default_currency: (formData.get('default_currency') as string) || 'PLN',
     show_logo_on_invoice: formData.get('show_logo_on_invoice') === 'on',
     updated_at: new Date().toISOString(),
   }

@@ -132,6 +132,7 @@ export interface Database {
           logo_url: string | null
           show_logo_on_invoice: boolean
           invoice_prefix: string | null
+          default_currency: string
           created_at: string
           updated_at: string
         }
@@ -151,6 +152,7 @@ export interface Database {
           logo_url?: string | null
           show_logo_on_invoice?: boolean
           invoice_prefix: string | null
+          default_currency: string
           created_at?: string
           updated_at?: string
         }
@@ -170,6 +172,7 @@ export interface Database {
           logo_url?: string | null
           show_logo_on_invoice?: boolean
           invoice_prefix: string | null
+          default_currency: string
           created_at?: string
           updated_at?: string
         }
