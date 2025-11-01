@@ -23,12 +23,9 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  const { data: clients } = await supabase.from('clients').select('*').limit(5)
+  const { data: clients } = await supabase.from('clients').select('*')
 
-  const { data: invoices } = await supabase
-    .from('invoices')
-    .select('*')
-    .limit(5)
+  const { data: invoices } = await supabase.from('invoices').select('*')
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -69,9 +66,7 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               <Link href="/dashboard/invoices">
-                <Button className="w-full" disabled>
-                  Manage Invoices (Coming Soon)
-                </Button>
+                <Button className="w-full">Manage Invoices</Button>
               </Link>
             </CardContent>
           </Card>
