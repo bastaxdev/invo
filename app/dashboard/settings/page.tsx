@@ -75,7 +75,7 @@ export default async function SettingsPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Invoice Seller Information</CardTitle>
+            <CardTitle>Business Information</CardTitle>
             <CardDescription>
               This information will appear on your generated invoices
             </CardDescription>
@@ -84,13 +84,16 @@ export default async function SettingsPage({
             <form action={updateProfile} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="full_name">Full Name</Label>
+                  <Label htmlFor="full_name">
+                    Full Name <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="full_name"
                     name="full_name"
                     type="text"
                     placeholder="Jan Kowalski"
                     defaultValue={profile?.full_name || ''}
+                    required
                   />
                 </div>
                 <div className="space-y-2">
@@ -119,37 +122,99 @@ export default async function SettingsPage({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="company_registration">
+                    Company Registration (Optional)
+                  </Label>
                   <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    placeholder="+48 123 456 789"
-                    defaultValue={profile?.phone || ''}
+                    id="company_registration"
+                    name="company_registration"
+                    type="text"
+                    placeholder="KRS 0000123456"
+                    defaultValue={profile?.company_registration || ''}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="+48 123 456 789"
+                  defaultValue={profile?.phone || ''}
+                />
+                <p className="text-xs text-slate-500">
+                  Include country code (e.g., +48 for Poland, +47 for Norway)
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="address">
+                  Address <span className="text-red-500">*</span>
+                </Label>
                 <Textarea
                   id="address"
                   name="address"
                   placeholder="ul. Przykładowa 1&#10;00-001 Warszawa&#10;Poland"
                   rows={3}
                   defaultValue={profile?.address || ''}
+                  required
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bank_account">Bank Account / IBAN</Label>
-                <Input
-                  id="bank_account"
-                  name="bank_account"
-                  type="text"
-                  placeholder="PL12 3456 7890 1234 5678 9012 3456"
-                  defaultValue={profile?.bank_account || ''}
-                />
+              <div className="border-t pt-4">
+                <h3 className="mb-4 text-lg font-semibold">Bank Details</h3>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="bank_account">Bank Account / IBAN</Label>
+                    <Input
+                      id="bank_account"
+                      name="bank_account"
+                      type="text"
+                      placeholder="PL61 1090 1014 0000 0712 1981 2874"
+                      defaultValue={profile?.bank_account || ''}
+                    />
+                    <p className="text-xs text-slate-500">
+                      IBAN format recommended
+                    </p>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="bank_name">Bank Name</Label>
+                      <Input
+                        id="bank_name"
+                        name="bank_name"
+                        type="text"
+                        placeholder="PKO Bank Polski"
+                        defaultValue={profile?.bank_name || ''}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="swift_bic">SWIFT/BIC Code</Label>
+                      <Input
+                        id="swift_bic"
+                        name="swift_bic"
+                        type="text"
+                        placeholder="BPKOPLPW"
+                        defaultValue={profile?.swift_bic || ''}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bank_address">Bank Address</Label>
+                    <Input
+                      id="bank_address"
+                      name="bank_address"
+                      type="text"
+                      placeholder="ul. Puławska 15, 02-515 Warszawa, Poland"
+                      defaultValue={profile?.bank_address || ''}
+                    />
+                  </div>
+                </div>
               </div>
 
               <Button type="submit" className="w-full sm:w-auto">

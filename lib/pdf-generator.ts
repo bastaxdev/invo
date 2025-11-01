@@ -32,6 +32,10 @@ interface UserProfile {
   address: string | null
   phone: string | null
   bank_account: string | null
+  bank_name: string | null
+  bank_address: string | null
+  swift_bic: string | null
+  company_registration: string | null
 }
 
 export async function generateInvoicePDF(

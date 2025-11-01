@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Font,
 } from '@react-pdf/renderer'
+import { formatIBAN, formatPhoneNumber, formatAddress } from '@/lib/formatters'
 
 // Register fonts that support Polish characters from CDN
 Font.register({
@@ -196,6 +197,10 @@ interface InvoicePDFProps {
     address: string | null
     phone: string | null
     bank_account: string | null
+    bank_name: string | null
+    bank_address: string | null
+    swift_bic: string | null
+    company_registration: string | null
   } | null
 }
 
@@ -297,7 +302,9 @@ export function InvoicePDF({
           {userProfile?.phone && (
             <View style={styles.row}>
               <Text style={styles.label}>Telefon / Phone:</Text>
-              <Text style={styles.value}>{userProfile.phone}</Text>
+              <Text style={styles.value}>
+                {formatPhoneNumber(userProfile.phone)}
+              </Text>
             </View>
           )}
           <View style={styles.row}>
@@ -306,12 +313,31 @@ export function InvoicePDF({
           </View>
         </View>
 
-        {userProfile?.bank_account && (
+        {(userProfile?.bank_account || userProfile?.bank_name) && (
           <View style={styles.bankInfo}>
-            <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>
+            <Text style={{ fontWeight: 'bold', marginBottom: 6 }}>
               Dane do przelewu / Bank Details:
             </Text>
-            <Text>{userProfile.bank_account}</Text>
+            {userProfile?.bank_account && (
+              <Text style={{ marginBottom: 2 }}>
+                IBAN: {formatIBAN(userProfile.bank_account)}
+              </Text>
+            )}
+            {userProfile?.bank_name && (
+              <Text style={{ marginBottom: 2 }}>
+                Bank: {userProfile.bank_name}
+              </Text>
+            )}
+            {userProfile?.swift_bic && (
+              <Text style={{ marginBottom: 2 }}>
+                SWIFT/BIC: {userProfile.swift_bic}
+              </Text>
+            )}
+            {userProfile?.bank_address && (
+              <Text style={{ fontSize: 8, color: '#666' }}>
+                {userProfile.bank_address}
+              </Text>
+            )}
           </View>
         )}
 

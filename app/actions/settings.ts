@@ -24,6 +24,10 @@ export async function updateProfile(formData: FormData) {
     address: formData.get('address') as string,
     phone: formData.get('phone') as string,
     bank_account: formData.get('bank_account') as string,
+    bank_name: formData.get('bank_name') as string,
+    bank_address: formData.get('bank_address') as string,
+    swift_bic: formData.get('swift_bic') as string,
+    company_registration: formData.get('company_registration') as string,
     updated_at: new Date().toISOString(),
   }
 
