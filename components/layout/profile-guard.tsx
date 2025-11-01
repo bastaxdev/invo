@@ -24,9 +24,18 @@ export async function ProfileGuard({
     .eq('user_id', user.id)
     .single()
 
-  const isProfileIncomplete = !profile || !profile.full_name || !profile.address
+  const isProfileIncomplete =
+    !profile ||
+    !profile.full_name ||
+    !profile.address ||
+    !profile.invoice_prefix
 
   if (isProfileIncomplete) {
+    const missingFields = []
+    if (!profile?.full_name) missingFields.push('Full Name')
+    if (!profile?.address) missingFields.push('Address')
+    if (!profile?.invoice_prefix) missingFields.push('Invoice Prefix')
+
     return (
       <div className="min-h-screen bg-slate-50">
         <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
@@ -41,7 +50,7 @@ export async function ProfileGuard({
               invoices.
             </p>
             <p className="mb-8 text-sm text-slate-600">
-              Required: Full Name, Address
+              Missing: {missingFields.join(', ')}
             </p>
             <a
               href="/dashboard/settings"

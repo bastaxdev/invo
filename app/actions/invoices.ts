@@ -5,10 +5,44 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@/lib/supabase/server'
 
+function generateRandomPrefix(): string {
+  // Generate 3 random uppercase letters + 1 random digit
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const digits = '0123456789'
+
+  let prefix = ''
+  for (let i = 0; i < 3; i++) {
+    prefix += letters.charAt(Math.floor(Math.random() * letters.length))
+  }
+  prefix += digits.charAt(Math.floor(Math.random() * digits.length))
+
+  return prefix
+}
+
+async function getUserPrefix(supabase: any, userId: string): Promise<string> {
+  // Get user's custom prefix from profile
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('invoice_prefix')
+    .eq('user_id', userId)
+    .single()
+
+  if (!profile?.invoice_prefix) {
+    throw new Error(
+      'Please set your invoice prefix in Settings before creating invoices'
+    )
+  }
+
+  return profile.invoice_prefix
+}
+
 async function generateInvoiceNumber(
   supabase: any,
   userId: string
 ): Promise<string> {
+  // Get user's custom prefix
+  const prefix = await getUserPrefix(supabase, userId)
+
   // Get all invoice numbers for this user
   const { data: invoices } = await supabase
     .from('invoices')
@@ -17,49 +51,29 @@ async function generateInvoiceNumber(
     .order('created_at', { ascending: false })
 
   if (!invoices || invoices.length === 0) {
-    return 'INV-001'
+    return `${prefix}-001`
   }
 
-  // Extract numbers from all INV-XXX format invoices
+  // Extract numbers from all PREFIX-XXX format invoices
   const numbers = invoices
     .map((inv: any) => {
-      const match = inv.invoice_number.match(/INV-(\d+)/)
+      const match = inv.invoice_number.match(new RegExp(`${prefix}-(\\d+)`))
       return match ? parseInt(match[1]) : 0
     })
     .filter((num: number) => num > 0)
 
   if (numbers.length === 0) {
-    return 'INV-001'
+    return `${prefix}-001`
   }
 
   // Get the highest number and increment
   const maxNumber = Math.max(...numbers)
   const nextNumber = maxNumber + 1
 
-  return `INV-${nextNumber.toString().padStart(3, '0')}`
+  return `${prefix}-${nextNumber.toString().padStart(3, '0')}`
 }
 
-async function isInvoiceNumberUnique(
-  supabase: any,
-  userId: string,
-  invoiceNumber: string,
-  excludeInvoiceId?: string
-): Promise<boolean> {
-  let query = supabase
-    .from('invoices')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('invoice_number', invoiceNumber)
-
-  if (excludeInvoiceId) {
-    query = query.neq('id', excludeInvoiceId)
-  }
-
-  const { data } = await query
-
-  return !data || data.length === 0
-}
-
+// Update createInvoice to catch the error if no prefix is set:
 export async function createInvoice(formData: FormData) {
   const supabase = await createSupabaseClient()
 
@@ -102,25 +116,45 @@ export async function createInvoice(formData: FormData) {
     redirect('/dashboard/invoices/new?error=Please select or create a client')
   }
 
+  // Get user's prefix
+  let prefix: string
+  try {
+    prefix = await getUserPrefix(supabase, user.id)
+  } catch (error: any) {
+    redirect(
+      '/dashboard/invoices/new?error=' + encodeURIComponent(error.message)
+    )
+  }
+
   // Handle invoice number
   let invoiceNumber = (formData.get('invoice_number') as string)?.trim()
 
   if (!invoiceNumber || invoiceNumber === '') {
-    // Auto-generate
+    // Auto-generate with user's prefix
     invoiceNumber = await generateInvoiceNumber(supabase, user.id)
 
     // Double-check uniqueness and increment if needed
     while (!(await isInvoiceNumberUnique(supabase, user.id, invoiceNumber))) {
-      const match = invoiceNumber.match(/INV-(\d+)/)
+      const match = invoiceNumber.match(new RegExp(`${prefix}-(\\d+)`))
       if (match) {
         const num = parseInt(match[1]) + 1
-        invoiceNumber = `INV-${num.toString().padStart(3, '0')}`
+        invoiceNumber = `${prefix}-${num.toString().padStart(3, '0')}`
       } else {
-        invoiceNumber = 'INV-001'
+        invoiceNumber = `${prefix}-001`
       }
     }
   } else {
-    // User provided a number - check if it's unique
+    // User provided a number - validate it uses their prefix
+    if (!invoiceNumber.startsWith(`${prefix}-`)) {
+      redirect(
+        '/dashboard/invoices/new?error=' +
+          encodeURIComponent(
+            `Invoice number must start with your prefix: ${prefix}-`
+          )
+      )
+    }
+
+    // Check if it's unique
     if (!(await isInvoiceNumberUnique(supabase, user.id, invoiceNumber))) {
       redirect(
         '/dashboard/invoices/new?error=' +
@@ -173,6 +207,7 @@ export async function createInvoice(formData: FormData) {
   redirect('/dashboard/invoices')
 }
 
+// Update updateInvoice similarly:
 export async function updateInvoice(id: string, formData: FormData) {
   const supabase = await createSupabaseClient()
 
@@ -184,11 +219,32 @@ export async function updateInvoice(id: string, formData: FormData) {
     redirect('/login')
   }
 
+  // Get user's prefix
+  let prefix: string
+  try {
+    prefix = await getUserPrefix(supabase, user.id)
+  } catch (error: any) {
+    redirect(
+      `/dashboard/invoices/${id}/edit?error=` +
+        encodeURIComponent(error.message)
+    )
+  }
+
   // Handle invoice number validation
   const invoiceNumber = (formData.get('invoice_number') as string)?.trim()
 
   if (!invoiceNumber || invoiceNumber === '') {
     redirect(`/dashboard/invoices/${id}/edit?error=Invoice number is required`)
+  }
+
+  // Validate it uses their prefix
+  if (!invoiceNumber.startsWith(`${prefix}-`)) {
+    redirect(
+      `/dashboard/invoices/${id}/edit?error=` +
+        encodeURIComponent(
+          `Invoice number must start with your prefix: ${prefix}-`
+        )
+    )
   }
 
   // Check if number is unique (excluding current invoice)
@@ -243,6 +299,7 @@ export async function updateInvoice(id: string, formData: FormData) {
   redirect('/dashboard/invoices')
 }
 
+// Keep deleteInvoice as is
 export async function deleteInvoice(id: string) {
   const supabase = await createSupabaseClient()
 

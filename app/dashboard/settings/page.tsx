@@ -144,6 +144,26 @@ export default async function SettingsPage({
                     defaultValue={profile?.business_name || ''}
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="invoice_prefix">
+                    Invoice Prefix <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="invoice_prefix"
+                    name="invoice_prefix"
+                    type="text"
+                    placeholder="e.g., INVO, JK, ABC"
+                    defaultValue={profile?.invoice_prefix || ''}
+                    maxLength={6}
+                    pattern="[A-Z0-9]{2,6}"
+                    className="uppercase"
+                    required
+                  />
+                  <p className="text-xs text-slate-500">
+                    2-6 characters, letters and numbers only. Used for invoice
+                    numbers (e.g., INVO-001, INVO-002)
+                  </p>
+                </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">

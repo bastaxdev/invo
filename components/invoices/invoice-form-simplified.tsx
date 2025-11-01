@@ -286,11 +286,11 @@ export function InvoiceFormSimplified({
             id="invoice_number"
             name="invoice_number"
             type="text"
-            placeholder="Auto-generated if left empty"
+            placeholder="Auto-generated with your unique prefix (e.g., ABC1-001)"
             defaultValue={invoice?.invoice_number}
           />
           <p className="text-xs text-slate-500">
-            Leave empty to auto-generate (e.g., INV-001)
+            Leave empty to auto-generate with your unique prefix
           </p>
         </div>
 

@@ -131,6 +131,7 @@ export interface Database {
           company_registration: string | null
           logo_url: string | null
           show_logo_on_invoice: boolean
+          invoice_prefix: string | null
           created_at: string
           updated_at: string
         }
@@ -149,6 +150,7 @@ export interface Database {
           company_registration?: string | null
           logo_url?: string | null
           show_logo_on_invoice?: boolean
+          invoice_prefix: string | null
           created_at?: string
           updated_at?: string
         }
@@ -167,6 +169,7 @@ export interface Database {
           company_registration?: string | null
           logo_url?: string | null
           show_logo_on_invoice?: boolean
+          invoice_prefix: string | null
           created_at?: string
           updated_at?: string
         }
