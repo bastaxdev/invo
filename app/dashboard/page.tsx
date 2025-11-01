@@ -26,6 +26,12 @@ export default async function DashboardPage() {
 
   const { data: invoices } = await supabase.from('invoices').select('*')
 
+  const { data: templates } = await supabase
+    .from('invoice_templates')
+    .select('*')
+
+  const totalRevenue = invoices?.reduce((sum, inv) => sum + inv.amount, 0) || 0
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
@@ -33,7 +39,7 @@ export default async function DashboardPage() {
         <p className="mt-2 text-slate-600">Welcome back, {user.email}</p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
             <CardTitle>Clients</CardTitle>
@@ -59,6 +65,38 @@ export default async function DashboardPage() {
           <CardContent>
             <Link href="/dashboard/invoices">
               <Button className="w-full">Manage Invoices</Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Templates</CardTitle>
+            <CardDescription>
+              {templates?.length || 0} template
+              {templates?.length !== 1 ? 's' : ''}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/dashboard/templates">
+              <Button className="w-full">Manage Templates</Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Analytics</CardTitle>
+            <CardDescription>
+              Total:{' '}
+              {totalRevenue.toLocaleString('nb-NO', {
+                minimumFractionDigits: 2,
+              })}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/dashboard/analytics">
+              <Button className="w-full">View Analytics</Button>
             </Link>
           </CardContent>
         </Card>

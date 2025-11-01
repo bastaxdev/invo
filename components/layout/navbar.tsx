@@ -52,6 +52,9 @@ export async function Navbar() {
               <Link href="/dashboard/templates">
                 <Button variant="ghost">Templates</Button>
               </Link>
+              <Link href="/dashboard/analytics">
+                <Button variant="ghost">Analytics</Button>
+              </Link>
             </div>
           </div>
 
