@@ -16,14 +16,12 @@ export async function createTemplate(formData: FormData) {
     redirect('/login')
   }
 
-  const mode = formData.get('mode') as string
   const templateData = {
     user_id: user.id,
     name: formData.get('name') as string,
     description: formData.get('description') as string,
     currency: formData.get('currency') as string,
     default_due_days: parseInt(formData.get('default_due_days') as string),
-    mode: mode || 'simple',
     is_default: formData.get('is_default') === 'on',
   }
 
@@ -75,13 +73,11 @@ export async function updateTemplate(id: string, formData: FormData) {
     redirect('/login')
   }
 
-  const mode = formData.get('mode') as string
   const data = {
     name: formData.get('name') as string,
     description: formData.get('description') as string,
     currency: formData.get('currency') as string,
     default_due_days: parseInt(formData.get('default_due_days') as string),
-    mode: mode || 'simple',
     is_default: formData.get('is_default') === 'on',
     updated_at: new Date().toISOString(),
   }

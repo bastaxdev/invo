@@ -13,6 +13,13 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { sendInvoiceEmail } from '@/app/actions/email'
 import { Mail } from 'lucide-react'
 
@@ -29,6 +36,7 @@ export function SendEmailDialog({
 }: SendEmailDialogProps) {
   const [open, setOpen] = useState(false)
   const [email, setEmail] = useState(defaultEmail || '')
+  const [language, setLanguage] = useState<'en' | 'pl' | 'no'>('en')
   const [isSending, setIsSending] = useState(false)
   const [message, setMessage] = useState<{
     type: 'success' | 'error'
@@ -40,7 +48,7 @@ export function SendEmailDialog({
     setIsSending(true)
     setMessage(null)
 
-    const result = await sendInvoiceEmail(invoiceId, email)
+    const result = await sendInvoiceEmail(invoiceId, email, language)
 
     if (result.error) {
       setMessage({ type: 'error', text: result.error })
@@ -81,8 +89,25 @@ export function SendEmailDialog({
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="language">Email Language</Label>
+            <Select
+              value={language}
+              onValueChange={(value: 'en' | 'pl' | 'no') => setLanguage(value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">🇬🇧 English</SelectItem>
+                <SelectItem value="pl">🇵🇱 Polish</SelectItem>
+                <SelectItem value="no">🇳🇴 Norwegian</SelectItem>
+              </SelectContent>
+            </Select>
             <p className="text-xs text-slate-500">
-              The invoice will be sent as a PDF attachment
+              Choose the language for the email body (PDF is always bilingual)
             </p>
           </div>
 

@@ -25,6 +25,13 @@ interface Client {
   address: string
 }
 
+interface Template {
+  id: string
+  name: string
+  currency: string
+  default_due_days: number
+}
+
 interface InvoiceItem {
   id?: string
   description: string
@@ -35,6 +42,7 @@ interface InvoiceItem {
 
 interface InvoiceFormProps {
   clients: Client[]
+  templates?: Template[]
   invoice?: {
     id?: string
     client_id: string
@@ -51,6 +59,7 @@ interface InvoiceFormProps {
 
 export function InvoiceFormSimplified({
   clients,
+  templates,
   invoice,
   invoiceItems,
   action,
@@ -76,6 +85,43 @@ export function InvoiceFormSimplified({
   const nextMonth = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     .toISOString()
     .split('T')[0]
+
+  const loadTemplate = async (templateId: string) => {
+    if (!templateId) return
+
+    try {
+      const response = await fetch(`/api/templates/${templateId}`)
+      const data = await response.json()
+
+      if (data.template && data.items) {
+        // Set currency from template
+        setCurrency(data.template.currency)
+
+        // Set due date based on default_due_days
+        const dueDate = new Date()
+        dueDate.setDate(dueDate.getDate() + data.template.default_due_days)
+
+        // Update due date field
+        const dueDateInput = document.getElementById(
+          'due_date'
+        ) as HTMLInputElement
+        if (dueDateInput) {
+          dueDateInput.value = dueDate.toISOString().split('T')[0]
+        }
+
+        // Load template items
+        const loadedItems = data.items.map((item: any) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          amount: item.quantity * item.unit_price,
+        }))
+        setItems(loadedItems)
+      }
+    } catch (error) {
+      console.error('Error loading template:', error)
+    }
+  }
 
   const addItem = () => {
     setItems([
@@ -130,6 +176,28 @@ export function InvoiceFormSimplified({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Template Selection */}
+      {templates && templates.length > 0 && !invoice && (
+        <div className="rounded-lg border bg-blue-50 p-4">
+          <Label htmlFor="template_id">Load from Template (Optional)</Label>
+          <Select onValueChange={loadTemplate}>
+            <SelectTrigger className="mt-2">
+              <SelectValue placeholder="Select a template to pre-fill" />
+            </SelectTrigger>
+            <SelectContent>
+              {templates.map((template) => (
+                <SelectItem key={template.id} value={template.id}>
+                  {template.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="mt-2 text-xs text-slate-600">
+            Loading a template will pre-fill currency, due date, and line items
+          </p>
+        </div>
+      )}
+
       {/* Client Selection */}
       <div className="space-y-4 rounded-lg border p-4">
         <div className="flex items-center space-x-2">

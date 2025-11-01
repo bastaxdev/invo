@@ -73,7 +73,6 @@ export default async function TemplatesPage({
                   <TableHead>Description</TableHead>
                   <TableHead>Currency</TableHead>
                   <TableHead>Due Days</TableHead>
-                  <TableHead>Mode</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -93,9 +92,6 @@ export default async function TemplatesPage({
                     </TableCell>
                     <TableCell>{template.currency}</TableCell>
                     <TableCell>{template.default_due_days} days</TableCell>
-                    <TableCell className="capitalize">
-                      {template.mode}
-                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Link href={`/dashboard/templates/${template.id}/edit`}>

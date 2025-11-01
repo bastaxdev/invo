@@ -33,6 +33,11 @@ export default async function NewInvoicePage({
     .select('*')
     .order('name')
 
+  const { data: templates } = await supabase
+    .from('invoice_templates')
+    .select('id, name, currency, default_due_days')
+    .order('name')
+
   return (
     <ProfileGuard>
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -51,6 +56,7 @@ export default async function NewInvoicePage({
             )}
             <InvoiceFormSimplified
               clients={clients || []}
+              templates={templates || []}
               action={createInvoice}
             />
           </CardContent>
