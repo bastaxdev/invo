@@ -16,9 +16,41 @@ export async function createInvoice(formData: FormData) {
     redirect('/login')
   }
 
-  const data = {
+  let clientId = formData.get('client_id') as string | null
+
+  // Check if creating a new client
+  const newClientName = formData.get('new_client_name') as string | null
+
+  if (newClientName) {
+    // Create new client first
+    const { data: newClient, error: clientError } = await supabase
+      .from('clients')
+      .insert({
+        user_id: user.id,
+        name: newClientName,
+        org_number: formData.get('new_client_org_number') as string,
+        address: formData.get('new_client_address') as string,
+      })
+      .select()
+      .single()
+
+    if (clientError) {
+      redirect(
+        '/dashboard/invoices/new?error=' +
+          encodeURIComponent(clientError.message)
+      )
+    }
+
+    clientId = newClient.id
+  }
+
+  if (!clientId) {
+    redirect('/dashboard/invoices/new?error=Please select or create a client')
+  }
+
+  const invoiceData = {
     user_id: user.id,
-    client_id: formData.get('client_id') as string,
+    client_id: clientId,
     invoice_number: formData.get('invoice_number') as string,
     issue_date: formData.get('issue_date') as string,
     due_date: formData.get('due_date') as string,
@@ -27,7 +59,7 @@ export async function createInvoice(formData: FormData) {
     currency: formData.get('currency') as string,
   }
 
-  const { error } = await supabase.from('invoices').insert(data)
+  const { error } = await supabase.from('invoices').insert(invoiceData)
 
   if (error) {
     redirect('/dashboard/invoices?error=' + encodeURIComponent(error.message))

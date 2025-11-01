@@ -1,10 +1,7 @@
-// app/dashboard/clients/[id]/edit/page.tsx
+// app/dashboard/invoices/[id]/edit/page.tsx
 import { redirect } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@/lib/supabase/server'
-import { updateClient } from '@/app/actions/clients'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { updateInvoice } from '@/app/actions/invoices'
 import {
   Card,
   CardContent,
@@ -12,9 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import Link from 'next/link'
+import { InvoiceForm } from '@/components/invoices/invoice-form'
 
-export default async function EditClientPage({
+export default async function EditInvoicePage({
   params,
 }: {
   params: Promise<{ id: string }>
@@ -30,73 +27,39 @@ export default async function EditClientPage({
     redirect('/login')
   }
 
-  const { data: client } = await supabase
-    .from('clients')
+  const { data: invoice } = await supabase
+    .from('invoices')
     .select('*')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
-  if (!client) {
-    redirect('/dashboard/clients')
+  if (!invoice) {
+    redirect('/dashboard/invoices')
   }
 
-  const updateClientWithId = updateClient.bind(null, id)
+  const { data: clients } = await supabase
+    .from('clients')
+    .select('*')
+    .order('name')
+
+  const updateInvoiceWithId = updateInvoice.bind(null, id)
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Edit Client</CardTitle>
-            <CardDescription>Update client information</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form action={updateClientWithId} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Client Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  type="text"
-                  defaultValue={client.name}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="org_number">Organization Number</Label>
-                <Input
-                  id="org_number"
-                  name="org_number"
-                  type="text"
-                  defaultValue={client.org_number}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
-                  name="address"
-                  type="text"
-                  defaultValue={client.address}
-                  required
-                />
-              </div>
-              <div className="flex gap-4">
-                <Button type="submit" className="flex-1">
-                  Update Client
-                </Button>
-                <Link href="/dashboard/clients" className="flex-1">
-                  <Button type="button" variant="outline" className="w-full">
-                    Cancel
-                  </Button>
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Edit Invoice</CardTitle>
+          <CardDescription>Update invoice information</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <InvoiceForm
+            clients={clients || []}
+            invoice={invoice}
+            action={updateInvoiceWithId}
+          />
+        </CardContent>
+      </Card>
     </div>
   )
 }
