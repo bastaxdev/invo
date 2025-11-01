@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { GeneratePDFButton } from '@/components/invoices/generate-pdf-button'
+import { SendEmailDialog } from '@/components/invoices/send-email-dialog'
 
 export default async function InvoiceViewPage({
   params,
@@ -57,14 +58,22 @@ export default async function InvoiceViewPage({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-slate-900">Invoice Details</h1>
-        <GeneratePDFButton
-          invoice={invoice}
-          invoiceItems={invoiceItems || undefined}
-          user={user}
-          userProfile={userProfile}
-        />
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-slate-900 mb-4">
+          Invoice Details
+        </h1>
+        <div className="flex gap-4">
+          <GeneratePDFButton
+            invoice={invoice}
+            invoiceItems={invoiceItems || undefined}
+            user={user}
+            userProfile={userProfile}
+          />
+          <SendEmailDialog
+            invoiceId={invoice.id}
+            invoiceNumber={invoice.invoice_number}
+          />
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
