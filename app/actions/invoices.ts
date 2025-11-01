@@ -22,7 +22,6 @@ export async function createInvoice(formData: FormData) {
   const newClientName = formData.get('new_client_name') as string | null
 
   if (newClientName) {
-    // Create new client first
     const { data: newClient, error: clientError } = await supabase
       .from('clients')
       .insert({
@@ -48,6 +47,7 @@ export async function createInvoice(formData: FormData) {
     redirect('/dashboard/invoices/new?error=Please select or create a client')
   }
 
+  const mode = formData.get('mode') as string
   const invoiceData = {
     user_id: user.id,
     client_id: clientId,
@@ -57,12 +57,33 @@ export async function createInvoice(formData: FormData) {
     description: formData.get('description') as string,
     amount: parseFloat(formData.get('amount') as string),
     currency: formData.get('currency') as string,
+    mode: mode || 'simple',
   }
 
-  const { error } = await supabase.from('invoices').insert(invoiceData)
+  const { data: invoice, error } = await supabase
+    .from('invoices')
+    .insert(invoiceData)
+    .select()
+    .single()
 
   if (error) {
     redirect('/dashboard/invoices?error=' + encodeURIComponent(error.message))
+  }
+
+  // Handle line items
+  const itemsJson = formData.get('items') as string
+  if (itemsJson) {
+    const items = JSON.parse(itemsJson)
+    const lineItems = items.map((item: any, index: number) => ({
+      invoice_id: invoice.id,
+      description: item.description,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      amount: item.amount,
+      sort_order: index,
+    }))
+
+    await supabase.from('invoice_items').insert(lineItems)
   }
 
   revalidatePath('/dashboard/invoices')
@@ -80,14 +101,15 @@ export async function updateInvoice(id: string, formData: FormData) {
     redirect('/login')
   }
 
+  const mode = formData.get('mode') as string
   const data = {
-    client_id: formData.get('client_id') as string,
     invoice_number: formData.get('invoice_number') as string,
     issue_date: formData.get('issue_date') as string,
     due_date: formData.get('due_date') as string,
     description: formData.get('description') as string,
     amount: parseFloat(formData.get('amount') as string),
     currency: formData.get('currency') as string,
+    mode: mode || 'simple',
     updated_at: new Date().toISOString(),
   }
 
@@ -99,6 +121,24 @@ export async function updateInvoice(id: string, formData: FormData) {
 
   if (error) {
     redirect('/dashboard/invoices?error=' + encodeURIComponent(error.message))
+  }
+
+  // Update line items - delete old ones and insert new
+  await supabase.from('invoice_items').delete().eq('invoice_id', id)
+
+  const itemsJson = formData.get('items') as string
+  if (itemsJson) {
+    const items = JSON.parse(itemsJson)
+    const lineItems = items.map((item: any, index: number) => ({
+      invoice_id: id,
+      description: item.description,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      amount: item.amount,
+      sort_order: index,
+    }))
+
+    await supabase.from('invoice_items').insert(lineItems)
   }
 
   revalidatePath('/dashboard/invoices')

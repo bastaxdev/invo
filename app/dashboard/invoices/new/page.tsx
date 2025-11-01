@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { InvoiceForm } from '@/components/invoices/invoice-form'
+import { AdvancedInvoiceForm } from '@/components/invoices/advanced-invoice-form'
 
 export default async function NewInvoicePage({
   searchParams,
@@ -32,7 +32,7 @@ export default async function NewInvoicePage({
     .order('name')
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <Card>
         <CardHeader>
           <CardTitle>Create Invoice</CardTitle>
@@ -46,7 +46,7 @@ export default async function NewInvoicePage({
               {searchParams.error}
             </div>
           )}
-          <InvoiceForm clients={clients || []} action={createInvoice} />
+          <AdvancedInvoiceForm clients={clients || []} action={createInvoice} />
         </CardContent>
       </Card>
     </div>

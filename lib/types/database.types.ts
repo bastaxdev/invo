@@ -50,6 +50,7 @@ export interface Database {
           description: string
           amount: number
           currency: string
+          mode: string
           created_at: string
           updated_at: string
         }
@@ -63,6 +64,7 @@ export interface Database {
           description: string
           amount: number
           currency?: string
+          mode?: string
           created_at?: string
           updated_at?: string
         }
@@ -76,8 +78,41 @@ export interface Database {
           description?: string
           amount?: number
           currency?: string
+          mode?: string
           created_at?: string
           updated_at?: string
+        }
+      }
+      invoice_items: {
+        Row: {
+          id: string
+          invoice_id: string
+          description: string
+          quantity: number
+          unit_price: number
+          amount: number
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          invoice_id: string
+          description: string
+          quantity?: number
+          unit_price: number
+          amount: number
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          invoice_id?: string
+          description?: string
+          quantity?: number
+          unit_price?: number
+          amount?: number
+          sort_order?: number
+          created_at?: string
         }
       }
       user_profiles: {
