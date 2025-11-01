@@ -1,4 +1,4 @@
-// components/invoices/advanced-invoice-form.tsx
+// components/invoices/invoice-form-simplified.tsx
 'use client'
 
 import { useState } from 'react'
@@ -33,7 +33,7 @@ interface InvoiceItem {
   amount: number
 }
 
-interface AdvancedInvoiceFormProps {
+interface InvoiceFormProps {
   clients: Client[]
   invoice?: {
     id?: string
@@ -44,33 +44,32 @@ interface AdvancedInvoiceFormProps {
     description: string
     amount: number
     currency: string
-    mode?: string
   }
   invoiceItems?: InvoiceItem[]
   action: (formData: FormData) => Promise<void>
 }
 
-export function AdvancedInvoiceForm({
+export function InvoiceFormSimplified({
   clients,
   invoice,
   invoiceItems,
   action,
-}: AdvancedInvoiceFormProps) {
+}: InvoiceFormProps) {
   const [useNewClient, setUseNewClient] = useState(false)
-  const [mode, setMode] = useState<'simple' | 'advanced'>(
-    (invoice?.mode as 'simple' | 'advanced') || 'simple'
-  )
+  const [currency, setCurrency] = useState(invoice?.currency || 'NOK')
   const [items, setItems] = useState<InvoiceItem[]>(
     invoiceItems && invoiceItems.length > 0
       ? invoiceItems
-      : [
+      : invoice
+      ? [
           {
-            description: invoice?.description || '',
+            description: invoice.description,
             quantity: 1,
-            unit_price: invoice?.amount || 0,
-            amount: invoice?.amount || 0,
+            unit_price: invoice.amount,
+            amount: invoice.amount,
           },
         ]
+      : [{ description: '', quantity: 1, unit_price: 0, amount: 0 }]
   )
 
   const today = new Date().toISOString().split('T')[0]
@@ -114,72 +113,23 @@ export function AdvancedInvoiceForm({
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
 
-    // Add mode
-    formData.set('mode', mode)
-
     // Add items as JSON
     formData.set('items', JSON.stringify(items))
 
     // Add total amount
     formData.set('amount', totalAmount.toString())
 
-    // Add simple mode description (first item description)
-    if (mode === 'simple') {
-      formData.set('description', items[0]?.description || '')
-    } else {
-      formData.set(
-        'description',
-        items.map((item) => item.description).join('; ')
-      )
-    }
+    // Add description (first item description or combined)
+    formData.set(
+      'description',
+      items.map((item) => item.description).join('; ')
+    )
 
     await action(formData)
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Mode Toggle */}
-      <div className="flex items-center justify-between rounded-lg border bg-slate-50 p-4">
-        <div>
-          <p className="font-medium">Invoice Mode</p>
-          <p className="text-sm text-slate-600">
-            {mode === 'simple'
-              ? 'Simple: One line item'
-              : 'Advanced: Multiple line items'}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant={mode === 'simple' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => {
-              if (mode === 'advanced' && items.length > 1) {
-                if (
-                  !confirm(
-                    'Switching to simple mode will keep only the first item. Continue?'
-                  )
-                ) {
-                  return
-                }
-                setItems([items[0]])
-              }
-              setMode('simple')
-            }}
-          >
-            Simple
-          </Button>
-          <Button
-            type="button"
-            variant={mode === 'advanced' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setMode('advanced')}
-          >
-            Advanced
-          </Button>
-        </div>
-      </div>
-
       {/* Client Selection */}
       <div className="space-y-4 rounded-lg border p-4">
         <div className="flex items-center space-x-2">
@@ -268,10 +218,12 @@ export function AdvancedInvoiceForm({
             id="invoice_number"
             name="invoice_number"
             type="text"
-            placeholder="e.g., INV-001"
+            placeholder="Auto-generated if left empty"
             defaultValue={invoice?.invoice_number}
-            required
           />
+          <p className="text-xs text-slate-500">
+            Leave empty to auto-generate (e.g., INV-001)
+          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -301,7 +253,8 @@ export function AdvancedInvoiceForm({
           <Label htmlFor="currency">Currency</Label>
           <Select
             name="currency"
-            defaultValue={invoice?.currency || 'NOK'}
+            value={currency}
+            onValueChange={setCurrency}
             required
           >
             <SelectTrigger>
@@ -320,12 +273,10 @@ export function AdvancedInvoiceForm({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Label>Line Items</Label>
-          {mode === 'advanced' && (
-            <Button type="button" variant="outline" size="sm" onClick={addItem}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Item
-            </Button>
-          )}
+          <Button type="button" variant="outline" size="sm" onClick={addItem}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Item
+          </Button>
         </div>
 
         {items.map((item, index) => (
@@ -390,7 +341,7 @@ export function AdvancedInvoiceForm({
                 </div>
               </div>
 
-              {mode === 'advanced' && items.length > 1 && (
+              {items.length > 1 && (
                 <Button
                   type="button"
                   variant="destructive"
@@ -409,7 +360,7 @@ export function AdvancedInvoiceForm({
           <div className="flex justify-between text-lg font-bold">
             <span>Total Amount:</span>
             <span>
-              {totalAmount.toFixed(2)} {invoice?.currency || 'NOK'}
+              {totalAmount.toFixed(2)} {currency}
             </span>
           </div>
         </div>

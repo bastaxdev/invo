@@ -5,6 +5,33 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@/lib/supabase/server'
 
+async function generateInvoiceNumber(
+  supabase: any,
+  userId: string
+): Promise<string> {
+  // Get the latest invoice number for this user
+  const { data: latestInvoice } = await supabase
+    .from('invoices')
+    .select('invoice_number')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (!latestInvoice?.invoice_number) {
+    return 'INV-001'
+  }
+
+  // Extract number from format INV-XXX
+  const match = latestInvoice.invoice_number.match(/INV-(\d+)/)
+  if (match) {
+    const nextNumber = parseInt(match[1]) + 1
+    return `INV-${nextNumber.toString().padStart(3, '0')}`
+  }
+
+  return 'INV-001'
+}
+
 export async function createInvoice(formData: FormData) {
   const supabase = await createSupabaseClient()
 
@@ -47,17 +74,21 @@ export async function createInvoice(formData: FormData) {
     redirect('/dashboard/invoices/new?error=Please select or create a client')
   }
 
-  const mode = formData.get('mode') as string
+  // Generate invoice number if not provided
+  let invoiceNumber = formData.get('invoice_number') as string
+  if (!invoiceNumber || invoiceNumber.trim() === '') {
+    invoiceNumber = await generateInvoiceNumber(supabase, user.id)
+  }
+
   const invoiceData = {
     user_id: user.id,
     client_id: clientId,
-    invoice_number: formData.get('invoice_number') as string,
+    invoice_number: invoiceNumber,
     issue_date: formData.get('issue_date') as string,
     due_date: formData.get('due_date') as string,
     description: formData.get('description') as string,
     amount: parseFloat(formData.get('amount') as string),
     currency: formData.get('currency') as string,
-    mode: mode || 'simple',
   }
 
   const { data: invoice, error } = await supabase
@@ -101,7 +132,6 @@ export async function updateInvoice(id: string, formData: FormData) {
     redirect('/login')
   }
 
-  const mode = formData.get('mode') as string
   const data = {
     invoice_number: formData.get('invoice_number') as string,
     issue_date: formData.get('issue_date') as string,
@@ -109,7 +139,6 @@ export async function updateInvoice(id: string, formData: FormData) {
     description: formData.get('description') as string,
     amount: parseFloat(formData.get('amount') as string),
     currency: formData.get('currency') as string,
-    mode: mode || 'simple',
     updated_at: new Date().toISOString(),
   }
 

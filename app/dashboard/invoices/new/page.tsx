@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { AdvancedInvoiceForm } from '@/components/invoices/advanced-invoice-form'
+import { InvoiceFormSimplified } from '@/components/invoices/invoice-form-simplified'
 
 export default async function NewInvoicePage({
   searchParams,
@@ -46,7 +46,10 @@ export default async function NewInvoicePage({
               {searchParams.error}
             </div>
           )}
-          <AdvancedInvoiceForm clients={clients || []} action={createInvoice} />
+          <InvoiceFormSimplified
+            clients={clients || []}
+            action={createInvoice}
+          />
         </CardContent>
       </Card>
     </div>

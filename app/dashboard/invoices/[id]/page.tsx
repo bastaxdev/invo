@@ -106,10 +106,6 @@ export default async function InvoiceViewPage({
                 {invoice.currency}
               </p>
             </div>
-            <div>
-              <p className="text-sm font-medium text-slate-500">Mode</p>
-              <p className="capitalize">{invoice.mode || 'simple'}</p>
-            </div>
           </CardContent>
         </Card>
 
