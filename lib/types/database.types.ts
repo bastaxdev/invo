@@ -80,6 +80,44 @@ export interface Database {
           updated_at?: string
         }
       }
+      user_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          full_name: string | null
+          business_name: string | null
+          tax_id: string | null
+          address: string | null
+          phone: string | null
+          bank_account: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          full_name?: string | null
+          business_name?: string | null
+          tax_id?: string | null
+          address?: string | null
+          phone?: string | null
+          bank_account?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          full_name?: string | null
+          business_name?: string | null
+          tax_id?: string | null
+          address?: string | null
+          phone?: string | null
+          bank_account?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
   }
 }
