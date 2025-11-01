@@ -36,6 +36,7 @@ interface UserProfile {
   bank_address: string | null
   swift_bic: string | null
   company_registration: string | null
+  logo_url: string | null
 }
 
 export async function generateInvoicePDF(

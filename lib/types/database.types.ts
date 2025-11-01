@@ -119,6 +119,7 @@ export interface Database {
         Row: {
           id: string
           user_id: string
+          logo_url: string | null
           full_name: string | null
           business_name: string | null
           tax_id: string | null
@@ -135,6 +136,7 @@ export interface Database {
         Insert: {
           id?: string
           user_id: string
+          logo_url: string | null
           full_name?: string | null
           business_name?: string | null
           tax_id?: string | null
@@ -151,6 +153,7 @@ export interface Database {
         Update: {
           id?: string
           user_id?: string
+          logo_url: string | null
           full_name?: string | null
           business_name?: string | null
           tax_id?: string | null

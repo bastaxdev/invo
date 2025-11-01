@@ -7,10 +7,10 @@ import {
   View,
   StyleSheet,
   Font,
+  Image,
 } from '@react-pdf/renderer'
-import { formatIBAN, formatPhoneNumber, formatAddress } from '@/lib/formatters'
+import { formatIBAN, formatPhoneNumber } from '@/lib/formatters'
 
-// Register fonts that support Polish characters from CDN
 Font.register({
   family: 'Roboto',
   fonts: [
@@ -29,6 +29,14 @@ const styles = StyleSheet.create({
     padding: 40,
     fontSize: 10,
     fontFamily: 'Roboto',
+  },
+  logo: {
+    position: 'absolute',
+    top: 40,
+    right: 40,
+    width: 80,
+    height: 60,
+    objectFit: 'contain',
   },
   header: {
     marginBottom: 30,
@@ -68,12 +76,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e5e7eb',
     marginVertical: 15,
-  },
-  description: {
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: '#f9fafb',
-    borderRadius: 4,
   },
   table: {
     marginTop: 20,
@@ -179,7 +181,6 @@ interface InvoicePDFProps {
     description: string
     amount: number
     currency: string
-    mode?: string
     clients: {
       name: string
       org_number: string
@@ -201,6 +202,7 @@ interface InvoicePDFProps {
     bank_address: string | null
     swift_bic: string | null
     company_registration: string | null
+    logo_url: string | null
   } | null
 }
 
@@ -225,7 +227,12 @@ export function InvoicePDF({
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Header */}
+        {/* Logo in top right */}
+        {userProfile?.logo_url && (
+          <Image src={userProfile.logo_url} style={styles.logo} />
+        )}
+
+        {/* Header - ONLY ONE */}
         <View style={styles.header}>
           <Text style={styles.title}>FAKTURA / INVOICE</Text>
           <Text style={styles.invoiceNumber}>
@@ -343,34 +350,32 @@ export function InvoicePDF({
 
         <View style={styles.divider} />
 
-        {/* Line Items Table */}
-        <View style={styles.table}>
-          <Text style={styles.sectionTitle}>Uslugi / Services</Text>
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableCol1}>Opis / Description</Text>
-            <Text style={styles.tableCol2}>Ilosc / Qty</Text>
-            <Text style={styles.tableCol3}>Cena / Price</Text>
-            <Text style={styles.tableCol4}>Kwota / Amount</Text>
-          </View>
-          {items.map((item, index) => (
-            <View key={index} style={styles.tableRow}>
-              <Text style={styles.tableCol1}>{item.description}</Text>
-              <Text style={styles.tableCol2}>{item.quantity}</Text>
-              <Text style={styles.tableCol3}>
-                {item.unit_price.toLocaleString('nb-NO', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </Text>
-              <Text style={styles.tableCol4}>
-                {item.amount.toLocaleString('nb-NO', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </Text>
-            </View>
-          ))}
+        {/* Services Section - NO DUPLICATE TITLE HERE */}
+        <Text style={styles.sectionTitle}>Uslugi / Services</Text>
+        <View style={styles.tableHeader}>
+          <Text style={styles.tableCol1}>Opis / Description</Text>
+          <Text style={styles.tableCol2}>Ilosc / Qty</Text>
+          <Text style={styles.tableCol3}>Cena / Price</Text>
+          <Text style={styles.tableCol4}>Kwota / Amount</Text>
         </View>
+        {items.map((item, index) => (
+          <View key={index} style={styles.tableRow}>
+            <Text style={styles.tableCol1}>{item.description}</Text>
+            <Text style={styles.tableCol2}>{item.quantity}</Text>
+            <Text style={styles.tableCol3}>
+              {item.unit_price.toLocaleString('nb-NO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </Text>
+            <Text style={styles.tableCol4}>
+              {item.amount.toLocaleString('nb-NO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </Text>
+          </View>
+        ))}
 
         {/* Total */}
         <View style={styles.total}>
@@ -401,7 +406,7 @@ export function InvoicePDF({
           </View>
         </View>
 
-        {/* Reverse Charge Notice - THE MAGIC */}
+        {/* Reverse Charge Notice */}
         <View style={styles.reverseCharge}>
           <Text style={styles.reverseChargeTitle}>
             ODWROTNE OBCIAZENIE MVA / REVERSE CHARGE VAT

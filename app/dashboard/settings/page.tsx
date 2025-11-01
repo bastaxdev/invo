@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { LogoUpload } from '@/components/settings/logo-upload'
 
 export default async function SettingsPage({
   searchParams,
@@ -70,6 +71,18 @@ export default async function SettingsPage({
               <Input value={user.email || ''} disabled />
               <p className="text-xs text-slate-500">Email cannot be changed</p>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Branding</CardTitle>
+            <CardDescription>
+              Upload your company logo for invoices
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LogoUpload currentLogoUrl={profile?.logo_url} userId={user.id} />
           </CardContent>
         </Card>
 
