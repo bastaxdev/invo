@@ -119,7 +119,6 @@ export interface Database {
         Row: {
           id: string
           user_id: string
-          logo_url: string | null
           full_name: string | null
           business_name: string | null
           tax_id: string | null
@@ -130,13 +129,14 @@ export interface Database {
           bank_address: string | null
           swift_bic: string | null
           company_registration: string | null
+          logo_url: string | null
+          show_logo_on_invoice: boolean
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
           user_id: string
-          logo_url: string | null
           full_name?: string | null
           business_name?: string | null
           tax_id?: string | null
@@ -147,13 +147,14 @@ export interface Database {
           bank_address?: string | null
           swift_bic?: string | null
           company_registration?: string | null
+          logo_url?: string | null
+          show_logo_on_invoice?: boolean
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           user_id?: string
-          logo_url: string | null
           full_name?: string | null
           business_name?: string | null
           tax_id?: string | null
@@ -164,6 +165,8 @@ export interface Database {
           bank_address?: string | null
           swift_bic?: string | null
           company_registration?: string | null
+          logo_url?: string | null
+          show_logo_on_invoice?: boolean
           created_at?: string
           updated_at?: string
         }

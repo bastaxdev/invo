@@ -17,6 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import Link from 'next/link'
+import { StatusBadge } from '@/components/invoices/status-badge'
 
 interface Invoice {
   id: string
@@ -25,6 +26,7 @@ interface Invoice {
   due_date: string
   amount: number
   currency: string
+  status: string
   clients: {
     name: string
   } | null
@@ -82,6 +84,29 @@ export default async function AnalyticsPage() {
   const totalInvoices = typedInvoices.length
   const totalRevenue = typedInvoices.reduce((sum, inv) => sum + inv.amount, 0)
 
+  // Count by status
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const statusCounts = {
+    draft: 0,
+    sent: 0,
+    paid: 0,
+    overdue: 0,
+  }
+
+  typedInvoices.forEach((inv) => {
+    const dueDate = new Date(inv.due_date)
+    dueDate.setHours(0, 0, 0, 0)
+
+    // Auto-calculate overdue if past due date and not paid
+    if (dueDate < today && inv.status !== 'paid') {
+      statusCounts.overdue++
+    } else {
+      statusCounts[inv.status as keyof typeof statusCounts]++
+    }
+  })
+
   // Group by currency
   const revenueByCurrency: RevenueByCurrency = typedInvoices.reduce(
     (acc, inv) => {
@@ -119,12 +144,6 @@ export default async function AnalyticsPage() {
   const topClients = Object.entries(clientStats)
     .sort((a, b) => b[1].amount - a[1].amount)
     .slice(0, 5)
-
-  // Recent invoices (overdue check)
-  const today = new Date()
-  const overdueInvoices = typedInvoices.filter(
-    (inv) => new Date(inv.due_date) < today
-  ).length
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -186,13 +205,51 @@ export default async function AnalyticsPage() {
             <CardTitle className="text-3xl">
               <span
                 className={
-                  overdueInvoices > 0 ? 'text-red-600' : 'text-green-600'
+                  statusCounts.overdue > 0 ? 'text-red-600' : 'text-green-600'
                 }
               >
-                {overdueInvoices}
+                {statusCounts.overdue}
               </span>
             </CardTitle>
           </CardHeader>
+        </Card>
+      </div>
+
+      {/* Status Breakdown */}
+      <div className="mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Invoice Status Breakdown</CardTitle>
+            <CardDescription>Current status of all invoices</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div className="rounded-lg border bg-slate-50 p-4">
+                <div className="text-2xl font-bold text-slate-700">
+                  {statusCounts.draft}
+                </div>
+                <div className="text-sm text-slate-600">Draft</div>
+              </div>
+              <div className="rounded-lg border bg-blue-50 p-4">
+                <div className="text-2xl font-bold text-blue-700">
+                  {statusCounts.sent}
+                </div>
+                <div className="text-sm text-blue-600">Sent</div>
+              </div>
+              <div className="rounded-lg border bg-green-50 p-4">
+                <div className="text-2xl font-bold text-green-700">
+                  {statusCounts.paid}
+                </div>
+                <div className="text-sm text-green-600">Paid</div>
+              </div>
+              <div className="rounded-lg border bg-red-50 p-4">
+                <div className="text-2xl font-bold text-red-700">
+                  {statusCounts.overdue}
+                </div>
+                <div className="text-sm text-red-600">Overdue</div>
+              </div>
+            </div>
+          </CardContent>
         </Card>
       </div>
 
@@ -281,7 +338,9 @@ export default async function AnalyticsPage() {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Recent Invoices</CardTitle>
-            <CardDescription>Latest 10 invoices</CardDescription>
+            <CardDescription>
+              Latest 10 invoices with current status
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {typedInvoices.length > 0 ? (
@@ -298,7 +357,12 @@ export default async function AnalyticsPage() {
                 </TableHeader>
                 <TableBody>
                   {typedInvoices.slice(0, 10).map((invoice) => {
-                    const isOverdue = new Date(invoice.due_date) < today
+                    const dueDate = new Date(invoice.due_date)
+                    dueDate.setHours(0, 0, 0, 0)
+                    const isOverdue =
+                      dueDate < today && invoice.status !== 'paid'
+                    const displayStatus = isOverdue ? 'overdue' : invoice.status
+
                     return (
                       <TableRow key={invoice.id}>
                         <TableCell className="font-medium">
@@ -330,15 +394,7 @@ export default async function AnalyticsPage() {
                           {invoice.currency}
                         </TableCell>
                         <TableCell>
-                          <span
-                            className={`inline-block rounded-full px-2 py-1 text-xs font-semibold ${
-                              isOverdue
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-green-100 text-green-800'
-                            }`}
-                          >
-                            {isOverdue ? 'Overdue' : 'Active'}
-                          </span>
+                          <StatusBadge status={displayStatus} />
                         </TableCell>
                       </TableRow>
                     )

@@ -203,6 +203,7 @@ interface InvoicePDFProps {
     swift_bic: string | null
     company_registration: string | null
     logo_url: string | null
+    show_logo_on_invoice: boolean
   } | null
 }
 
@@ -227,10 +228,11 @@ export function InvoicePDF({
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Logo in top right */}
-        {userProfile?.logo_url && (
-          <Image src={userProfile.logo_url} style={styles.logo} />
-        )}
+        {/* Logo in top right - only if enabled */}
+        {userProfile?.logo_url &&
+          userProfile?.show_logo_on_invoice !== false && (
+            <Image src={userProfile.logo_url} style={styles.logo} />
+          )}
 
         {/* Header - ONLY ONE */}
         <View style={styles.header}>

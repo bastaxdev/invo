@@ -37,6 +37,7 @@ interface UserProfile {
   swift_bic: string | null
   company_registration: string | null
   logo_url: string | null
+  show_logo_on_invoice: boolean
 }
 
 export async function generateInvoicePDF(

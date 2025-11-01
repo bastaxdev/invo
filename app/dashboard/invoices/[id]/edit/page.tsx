@@ -13,10 +13,13 @@ import { InvoiceFormSimplified } from '@/components/invoices/invoice-form-simpli
 
 export default async function EditInvoicePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ error?: string }>
 }) {
   const { id } = await params
+  const params2 = await searchParams
   const supabase = await createSupabaseClient()
 
   const {
@@ -59,6 +62,11 @@ export default async function EditInvoicePage({
           <CardDescription>Update invoice information</CardDescription>
         </CardHeader>
         <CardContent>
+          {params2.error && (
+            <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+              {params2.error}
+            </div>
+          )}
           <InvoiceFormSimplified
             clients={clients || []}
             invoice={invoice}

@@ -28,6 +28,7 @@ export async function updateProfile(formData: FormData) {
     bank_address: formData.get('bank_address') as string,
     swift_bic: formData.get('swift_bic') as string,
     company_registration: formData.get('company_registration') as string,
+    show_logo_on_invoice: formData.get('show_logo_on_invoice') === 'on',
     updated_at: new Date().toISOString(),
   }
 

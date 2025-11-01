@@ -9,27 +9,55 @@ async function generateInvoiceNumber(
   supabase: any,
   userId: string
 ): Promise<string> {
-  // Get the latest invoice number for this user
-  const { data: latestInvoice } = await supabase
+  // Get all invoice numbers for this user
+  const { data: invoices } = await supabase
     .from('invoices')
     .select('invoice_number')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
-    .limit(1)
-    .single()
 
-  if (!latestInvoice?.invoice_number) {
+  if (!invoices || invoices.length === 0) {
     return 'INV-001'
   }
 
-  // Extract number from format INV-XXX
-  const match = latestInvoice.invoice_number.match(/INV-(\d+)/)
-  if (match) {
-    const nextNumber = parseInt(match[1]) + 1
-    return `INV-${nextNumber.toString().padStart(3, '0')}`
+  // Extract numbers from all INV-XXX format invoices
+  const numbers = invoices
+    .map((inv: any) => {
+      const match = inv.invoice_number.match(/INV-(\d+)/)
+      return match ? parseInt(match[1]) : 0
+    })
+    .filter((num: number) => num > 0)
+
+  if (numbers.length === 0) {
+    return 'INV-001'
   }
 
-  return 'INV-001'
+  // Get the highest number and increment
+  const maxNumber = Math.max(...numbers)
+  const nextNumber = maxNumber + 1
+
+  return `INV-${nextNumber.toString().padStart(3, '0')}`
+}
+
+async function isInvoiceNumberUnique(
+  supabase: any,
+  userId: string,
+  invoiceNumber: string,
+  excludeInvoiceId?: string
+): Promise<boolean> {
+  let query = supabase
+    .from('invoices')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('invoice_number', invoiceNumber)
+
+  if (excludeInvoiceId) {
+    query = query.neq('id', excludeInvoiceId)
+  }
+
+  const { data } = await query
+
+  return !data || data.length === 0
 }
 
 export async function createInvoice(formData: FormData) {
@@ -74,10 +102,33 @@ export async function createInvoice(formData: FormData) {
     redirect('/dashboard/invoices/new?error=Please select or create a client')
   }
 
-  // Generate invoice number if not provided
-  let invoiceNumber = formData.get('invoice_number') as string
-  if (!invoiceNumber || invoiceNumber.trim() === '') {
+  // Handle invoice number
+  let invoiceNumber = (formData.get('invoice_number') as string)?.trim()
+
+  if (!invoiceNumber || invoiceNumber === '') {
+    // Auto-generate
     invoiceNumber = await generateInvoiceNumber(supabase, user.id)
+
+    // Double-check uniqueness and increment if needed
+    while (!(await isInvoiceNumberUnique(supabase, user.id, invoiceNumber))) {
+      const match = invoiceNumber.match(/INV-(\d+)/)
+      if (match) {
+        const num = parseInt(match[1]) + 1
+        invoiceNumber = `INV-${num.toString().padStart(3, '0')}`
+      } else {
+        invoiceNumber = 'INV-001'
+      }
+    }
+  } else {
+    // User provided a number - check if it's unique
+    if (!(await isInvoiceNumberUnique(supabase, user.id, invoiceNumber))) {
+      redirect(
+        '/dashboard/invoices/new?error=' +
+          encodeURIComponent(
+            `Invoice number "${invoiceNumber}" already exists. Please use a different number or leave blank to auto-generate.`
+          )
+      )
+    }
   }
 
   const invoiceData = {
@@ -89,6 +140,7 @@ export async function createInvoice(formData: FormData) {
     description: formData.get('description') as string,
     amount: parseFloat(formData.get('amount') as string),
     currency: formData.get('currency') as string,
+    status: 'draft',
   }
 
   const { data: invoice, error } = await supabase
@@ -132,8 +184,25 @@ export async function updateInvoice(id: string, formData: FormData) {
     redirect('/login')
   }
 
+  // Handle invoice number validation
+  const invoiceNumber = (formData.get('invoice_number') as string)?.trim()
+
+  if (!invoiceNumber || invoiceNumber === '') {
+    redirect(`/dashboard/invoices/${id}/edit?error=Invoice number is required`)
+  }
+
+  // Check if number is unique (excluding current invoice)
+  if (!(await isInvoiceNumberUnique(supabase, user.id, invoiceNumber, id))) {
+    redirect(
+      `/dashboard/invoices/${id}/edit?error=` +
+        encodeURIComponent(
+          `Invoice number "${invoiceNumber}" already exists. Please use a different number.`
+        )
+    )
+  }
+
   const data = {
-    invoice_number: formData.get('invoice_number') as string,
+    invoice_number: invoiceNumber,
     issue_date: formData.get('issue_date') as string,
     due_date: formData.get('due_date') as string,
     description: formData.get('description') as string,

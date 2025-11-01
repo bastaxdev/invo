@@ -81,8 +81,27 @@ export default async function SettingsPage({
               Upload your company logo for invoices
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <LogoUpload currentLogoUrl={profile?.logo_url} userId={user.id} />
+
+            {profile?.logo_url && (
+              <div className="flex items-center space-x-2 pt-4 border-t">
+                <input
+                  type="checkbox"
+                  id="show_logo_on_invoice"
+                  name="show_logo_on_invoice"
+                  defaultChecked={profile?.show_logo_on_invoice ?? true}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  form="profile-form"
+                />
+                <label
+                  htmlFor="show_logo_on_invoice"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Show logo on invoices
+                </label>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -94,7 +113,11 @@ export default async function SettingsPage({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form action={updateProfile} className="space-y-4">
+            <form
+              id="profile-form"
+              action={updateProfile}
+              className="space-y-4"
+            >
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="full_name">
