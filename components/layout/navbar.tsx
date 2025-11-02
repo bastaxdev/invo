@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { MiniMVAIndicator } from '@/components/layout/mini-mva-indicator'
 import { calculateLast12MonthsRevenueNOK } from '@/app/actions/mva'
 
@@ -27,15 +27,32 @@ export async function Navbar() {
     redirect('/login')
   }
 
-  const initials =
-    user.email?.split('@')[0].substring(0, 2).toUpperCase() || 'U'
-
-  // Get MVA data
+  // Get user profile for logo and name
   const { data: profile } = await supabase
     .from('user_profiles')
-    .select('mva_registered')
+    .select('mva_registered, logo_url, business_name, full_name')
     .eq('user_id', user.id)
     .single()
+
+  // Determine initials based on business_name or full_name, fallback to email
+  let initials = 'U'
+  if (profile?.business_name) {
+    initials = profile.business_name
+      .split(' ')
+      .map((word: string) => word[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase()
+  } else if (profile?.full_name) {
+    initials = profile.full_name
+      .split(' ')
+      .map((word: string) => word[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase()
+  } else {
+    initials = user.email?.split('@')[0].substring(0, 2).toUpperCase() || 'U'
+  }
 
   const revenueNOK = await calculateLast12MonthsRevenueNOK()
 
@@ -86,6 +103,14 @@ export async function Navbar() {
                   className="relative h-10 w-10 rounded-full"
                 >
                   <Avatar>
+                    {/* Show logo if available, otherwise show initials */}
+                    {profile?.logo_url && (
+                      <AvatarImage
+                        src={profile.logo_url}
+                        alt="Company logo"
+                        className="object-cover"
+                      />
+                    )}
                     <AvatarFallback className="bg-slate-900 text-white">
                       {initials}
                     </AvatarFallback>
