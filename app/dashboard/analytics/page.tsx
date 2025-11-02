@@ -27,6 +27,9 @@ interface Invoice {
   issue_date: string
   due_date: string
   amount: number
+  vat_rate: number
+  vat_amount: number
+  amount_with_vat: number
   currency: string
   status: string
   clients: {
@@ -60,7 +63,7 @@ export default async function AnalyticsPage({
   const defaultCurrency = profile?.default_currency || 'PLN'
   const displayCurrency = params.currency || defaultCurrency
 
-  // Fetch all invoices with clients
+  // Fetch all invoices with clients and VAT data
   const { data: invoices } = await supabase
     .from('invoices')
     .select(
@@ -102,11 +105,11 @@ export default async function AnalyticsPage({
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900">Analytics</h1>
         <p className="mt-2 text-slate-600">
-          Overview of your invoicing activity
+          Comprehensive overview of your financial performance
         </p>
       </div>
 
-      {/* Currency-converted analytics - client component */}
+      {/* Currency-converted analytics with VAT tracking - client component */}
       <AnalyticsClient
         invoices={typedInvoices}
         defaultCurrency={defaultCurrency}
@@ -168,7 +171,9 @@ export default async function AnalyticsPage({
                   <TableHead>Client</TableHead>
                   <TableHead>Issue Date</TableHead>
                   <TableHead>Due Date</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right">Net Amount</TableHead>
+                  <TableHead className="text-right">VAT</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
@@ -204,6 +209,18 @@ export default async function AnalyticsPage({
                       </TableCell>
                       <TableCell className="text-right">
                         {formatCurrency(invoice.amount, invoice.currency)}
+                      </TableCell>
+                      <TableCell className="text-right text-slate-600">
+                        {formatCurrency(
+                          invoice.vat_amount || 0,
+                          invoice.currency
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right font-semibold">
+                        {formatCurrency(
+                          invoice.amount_with_vat || invoice.amount,
+                          invoice.currency
+                        )}
                       </TableCell>
                       <TableCell>
                         <StatusBadge status={displayStatus} />

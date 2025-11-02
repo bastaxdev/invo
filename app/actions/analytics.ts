@@ -11,6 +11,9 @@ interface Invoice {
   issue_date: string
   due_date: string
   amount: number
+  vat_rate: number
+  vat_amount: number
+  amount_with_vat: number
   currency: string
   status: string
   clients: {
@@ -53,50 +56,115 @@ export async function getAnalyticsData(displayCurrency?: string) {
 
   const typedInvoices = (invoices as Invoice[]) || []
 
-  // Calculate total revenue (PAID invoices only)
+  // Separate invoices by status
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
   const paidInvoices = typedInvoices.filter((inv) => inv.status === 'paid')
-  const totalRevenue = await convertAndSum(
+  const sentInvoices = typedInvoices.filter((inv) => {
+    const dueDate = new Date(inv.due_date)
+    dueDate.setHours(0, 0, 0, 0)
+    return inv.status === 'sent' && dueDate >= today
+  })
+  const overdueInvoices = typedInvoices.filter((inv) => {
+    const dueDate = new Date(inv.due_date)
+    dueDate.setHours(0, 0, 0, 0)
+    return dueDate < today && inv.status !== 'paid'
+  })
+
+  // Calculate PAID revenue metrics
+  const paidNetSales = await convertAndSum(
     paidInvoices.map((inv) => ({ amount: inv.amount, currency: inv.currency })),
     targetCurrency
   )
 
-  // Calculate expected total revenue (ALL invoices)
-  const expectedRevenue = await convertAndSum(
-    typedInvoices.map((inv) => ({
+  const paidVatCollected = await convertAndSum(
+    paidInvoices.map((inv) => ({
+      amount: inv.vat_amount || 0,
+      currency: inv.currency,
+    })),
+    targetCurrency
+  )
+
+  const paidGrossSales = await convertAndSum(
+    paidInvoices.map((inv) => ({
+      amount: inv.amount_with_vat || inv.amount,
+      currency: inv.currency,
+    })),
+    targetCurrency
+  )
+
+  // Calculate OUTSTANDING revenue (sent + overdue)
+  const outstandingInvoices = [...sentInvoices, ...overdueInvoices]
+  const outstandingNetSales = await convertAndSum(
+    outstandingInvoices.map((inv) => ({
       amount: inv.amount,
       currency: inv.currency,
     })),
     targetCurrency
   )
 
+  const outstandingVat = await convertAndSum(
+    outstandingInvoices.map((inv) => ({
+      amount: inv.vat_amount || 0,
+      currency: inv.currency,
+    })),
+    targetCurrency
+  )
+
+  const outstandingGrossSales = await convertAndSum(
+    outstandingInvoices.map((inv) => ({
+      amount: inv.amount_with_vat || inv.amount,
+      currency: inv.currency,
+    })),
+    targetCurrency
+  )
+
+  // Calculate TOTAL revenue (all invoices except draft)
+  const nonDraftInvoices = typedInvoices.filter((inv) => inv.status !== 'draft')
+  const totalNetSales = await convertAndSum(
+    nonDraftInvoices.map((inv) => ({
+      amount: inv.amount,
+      currency: inv.currency,
+    })),
+    targetCurrency
+  )
+
+  const totalVat = await convertAndSum(
+    nonDraftInvoices.map((inv) => ({
+      amount: inv.vat_amount || 0,
+      currency: inv.currency,
+    })),
+    targetCurrency
+  )
+
+  const totalGrossSales = await convertAndSum(
+    nonDraftInvoices.map((inv) => ({
+      amount: inv.amount_with_vat || inv.amount,
+      currency: inv.currency,
+    })),
+    targetCurrency
+  )
+
   // Calculate average invoice (paid only)
-  const averageInvoice =
-    paidInvoices.length > 0 ? totalRevenue / paidInvoices.length : 0
+  const averageInvoiceNet =
+    paidInvoices.length > 0 ? paidNetSales / paidInvoices.length : 0
+  const averageInvoiceGross =
+    paidInvoices.length > 0 ? paidGrossSales / paidInvoices.length : 0
 
   // Count by status
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
   const statusCounts = {
-    draft: 0,
-    sent: 0,
-    paid: 0,
-    overdue: 0,
+    draft: typedInvoices.filter((inv) => inv.status === 'draft').length,
+    sent: sentInvoices.length,
+    paid: paidInvoices.length,
+    overdue: overdueInvoices.length,
   }
 
-  typedInvoices.forEach((inv) => {
-    const dueDate = new Date(inv.due_date)
-    dueDate.setHours(0, 0, 0, 0)
-
-    if (dueDate < today && inv.status !== 'paid') {
-      statusCounts.overdue++
-    } else {
-      statusCounts[inv.status as keyof typeof statusCounts]++
-    }
-  })
-
   // Monthly breakdown (paid invoices)
-  const monthlyData: Record<string, { count: number; amount: number }> = {}
+  const monthlyData: Record<
+    string,
+    { count: number; netAmount: number; vatAmount: number; grossAmount: number }
+  > = {}
 
   for (const inv of paidInvoices) {
     const month = new Date(inv.issue_date).toLocaleDateString('en-US', {
@@ -104,47 +172,102 @@ export async function getAnalyticsData(displayCurrency?: string) {
       month: 'short',
     })
 
-    const convertedAmount = await convertCurrency(
+    const convertedNet = await convertCurrency(
       inv.amount,
+      inv.currency,
+      targetCurrency
+    )
+    const convertedVat = await convertCurrency(
+      inv.vat_amount || 0,
+      inv.currency,
+      targetCurrency
+    )
+    const convertedGross = await convertCurrency(
+      inv.amount_with_vat || inv.amount,
       inv.currency,
       targetCurrency
     )
 
     if (!monthlyData[month]) {
-      monthlyData[month] = { count: 0, amount: 0 }
+      monthlyData[month] = {
+        count: 0,
+        netAmount: 0,
+        vatAmount: 0,
+        grossAmount: 0,
+      }
     }
     monthlyData[month].count++
-    monthlyData[month].amount += convertedAmount
+    monthlyData[month].netAmount += convertedNet
+    monthlyData[month].vatAmount += convertedVat
+    monthlyData[month].grossAmount += convertedGross
   }
 
   // Top clients (paid invoices)
-  const clientData: Record<string, { count: number; amount: number }> = {}
+  const clientData: Record<
+    string,
+    { count: number; netAmount: number; vatAmount: number; grossAmount: number }
+  > = {}
 
   for (const inv of paidInvoices) {
     const clientName = inv.clients?.name || 'Unknown'
-    const convertedAmount = await convertCurrency(
+    const convertedNet = await convertCurrency(
       inv.amount,
+      inv.currency,
+      targetCurrency
+    )
+    const convertedVat = await convertCurrency(
+      inv.vat_amount || 0,
+      inv.currency,
+      targetCurrency
+    )
+    const convertedGross = await convertCurrency(
+      inv.amount_with_vat || inv.amount,
       inv.currency,
       targetCurrency
     )
 
     if (!clientData[clientName]) {
-      clientData[clientName] = { count: 0, amount: 0 }
+      clientData[clientName] = {
+        count: 0,
+        netAmount: 0,
+        vatAmount: 0,
+        grossAmount: 0,
+      }
     }
     clientData[clientName].count++
-    clientData[clientName].amount += convertedAmount
+    clientData[clientName].netAmount += convertedNet
+    clientData[clientName].vatAmount += convertedVat
+    clientData[clientName].grossAmount += convertedGross
   }
 
   const topClients = Object.entries(clientData)
-    .sort((a, b) => b[1].amount - a[1].amount)
+    .sort((a, b) => b[1].grossAmount - a[1].grossAmount)
     .slice(0, 5)
 
   return {
     totalInvoices: typedInvoices.length,
     paidInvoicesCount: paidInvoices.length,
-    totalRevenue,
-    expectedRevenue,
-    averageInvoice,
+    outstandingInvoicesCount: outstandingInvoices.length,
+
+    // Paid metrics
+    paidNetSales,
+    paidVatCollected,
+    paidGrossSales,
+
+    // Outstanding metrics
+    outstandingNetSales,
+    outstandingVat,
+    outstandingGrossSales,
+
+    // Total metrics (all non-draft)
+    totalNetSales,
+    totalVat,
+    totalGrossSales,
+
+    // Averages
+    averageInvoiceNet,
+    averageInvoiceGross,
+
     statusCounts,
     monthlyData,
     topClients,
