@@ -114,6 +114,111 @@ export default async function SettingsPage({
 
         <Card>
           <CardHeader>
+            <CardTitle>Norwegian MVA (VAT) Registration</CardTitle>
+            <CardDescription>
+              Required when your revenue exceeds 50,000 NOK in 12 months
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="mva_registered"
+                  name="mva_registered"
+                  defaultChecked={profile?.mva_registered ?? false}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  form="profile-form"
+                />
+                <label
+                  htmlFor="mva_registered"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  I am registered for Norwegian MVA
+                </label>
+              </div>
+
+              <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800">
+                <p className="font-semibold mb-1">What is MVA?</p>
+                <p>
+                  MVA (Merverdiavgift) is Norwegian VAT. If you earn more than
+                  50,000 NOK from Norwegian clients in a 12-month period, you
+                  must register and charge 25% VAT on your invoices.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Invoice Languages</CardTitle>
+            <CardDescription>
+              Choose which languages to include in your PDF invoices
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="pdf_language_polish"
+                  name="pdf_language_polish"
+                  defaultChecked={profile?.pdf_language_polish ?? true}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  form="profile-form"
+                />
+                <label
+                  htmlFor="pdf_language_polish"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  🇵🇱 Polish (Polski)
+                </label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="pdf_language_norwegian"
+                  name="pdf_language_norwegian"
+                  defaultChecked={profile?.pdf_language_norwegian ?? true}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  form="profile-form"
+                />
+                <label
+                  htmlFor="pdf_language_norwegian"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  🇳🇴 Norwegian (Norsk)
+                </label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="pdf_language_english"
+                  name="pdf_language_english"
+                  defaultChecked={profile?.pdf_language_english ?? false}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  form="profile-form"
+                />
+                <label
+                  htmlFor="pdf_language_english"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  🇬🇧 English
+                </label>
+              </div>
+
+              <p className="text-xs text-slate-500 pt-2">
+                Select at least one language. Your invoices will include all
+                selected languages.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
             <CardTitle>Business Information</CardTitle>
             <CardDescription>
               This information will appear on your generated invoices

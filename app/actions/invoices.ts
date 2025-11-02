@@ -329,3 +329,112 @@ export async function deleteInvoice(id: string) {
 
   revalidatePath('/dashboard/invoices')
 }
+
+export async function getOverdueInvoices() {
+  const supabase = await createSupabaseClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return []
+  }
+
+  const today = new Date().toISOString().split('T')[0]
+
+  const { data: invoices } = await supabase
+    .from('invoices')
+    .select(
+      `
+      id,
+      invoice_number,
+      due_date,
+      amount,
+      currency,
+      clients (
+        name
+      )
+    `
+    )
+    .eq('user_id', user.id)
+    .eq('payment_received', false)
+    .lt('due_date', today)
+    .order('due_date', { ascending: true })
+
+  return invoices || []
+}
+
+export async function markInvoiceAsPaid(invoiceId: string) {
+  const supabase = await createSupabaseClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return
+  }
+
+  await supabase
+    .from('invoices')
+    .update({
+      payment_received: true,
+      payment_date: new Date().toISOString(),
+      status: 'paid',
+    })
+    .eq('id', invoiceId)
+    .eq('user_id', user.id)
+
+  revalidatePath('/dashboard')
+  revalidatePath('/dashboard/invoices')
+}
+
+export async function dismissOverdueCheck() {
+  const supabase = await createSupabaseClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return
+  }
+
+  await supabase
+    .from('user_profiles')
+    .update({
+      last_overdue_check: new Date().toISOString(),
+    })
+    .eq('user_id', user.id)
+
+  revalidatePath('/dashboard')
+}
+
+export async function shouldShowOverdueCheck(): Promise<boolean> {
+  const supabase = await createSupabaseClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return false
+  }
+
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('last_overdue_check')
+    .eq('user_id', user.id)
+    .single()
+
+  if (!profile?.last_overdue_check) {
+    return true
+  }
+
+  const lastCheck = new Date(profile.last_overdue_check)
+  const today = new Date()
+
+  // Show if last check was on a different day
+  return lastCheck.toDateString() !== today.toDateString()
+}

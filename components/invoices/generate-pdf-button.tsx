@@ -52,6 +52,9 @@ interface GeneratePDFButtonProps {
     company_registration: string | null
     logo_url: string | null
     show_logo_on_invoice: boolean
+    pdf_language_polish: boolean
+    pdf_language_norwegian: boolean
+    pdf_language_english: boolean
   } | null
 }
 

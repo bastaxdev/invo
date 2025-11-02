@@ -13,6 +13,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { MiniMVAIndicator } from '@/components/layout/mini-mva-indicator'
+import { calculateLast12MonthsRevenueNOK } from '@/app/actions/mva'
 
 export async function Navbar() {
   const supabase = await createClient()
@@ -27,6 +29,15 @@ export async function Navbar() {
 
   const initials =
     user.email?.split('@')[0].substring(0, 2).toUpperCase() || 'U'
+
+  // Get MVA data
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('mva_registered')
+    .eq('user_id', user.id)
+    .single()
+
+  const revenueNOK = await calculateLast12MonthsRevenueNOK()
 
   return (
     <nav className="border-b bg-white">
@@ -58,8 +69,13 @@ export async function Navbar() {
             </div>
           </div>
 
-          {/* User Dropdown */}
-          <div className="flex items-center">
+          {/* MVA Indicator + User Dropdown */}
+          <div className="flex items-center gap-3">
+            <MiniMVAIndicator
+              revenueNOK={revenueNOK}
+              mvaRegistered={profile?.mva_registered || false}
+            />
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

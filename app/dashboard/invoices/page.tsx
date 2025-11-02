@@ -13,6 +13,11 @@ import {
 import Link from 'next/link'
 import { DeleteInvoiceButton } from '@/components/invoices/delete-invoice-button'
 import { StatusBadge } from '@/components/invoices/status-badge'
+import {
+  getOverdueInvoices,
+  shouldShowOverdueCheck,
+} from '@/app/actions/invoices'
+import { OverdueInvoiceDialog } from '@/components/invoices/overdue-invoice-dialog'
 
 export default async function InvoicesPage({
   searchParams,
@@ -42,8 +47,17 @@ export default async function InvoicesPage({
     )
     .order('created_at', { ascending: false })
 
+  // Check for overdue invoices
+  const showOverdueCheck = await shouldShowOverdueCheck()
+  const overdueInvoices = showOverdueCheck ? await getOverdueInvoices() : []
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Overdue Invoice Dialog */}
+      {overdueInvoices.length > 0 && (
+        <OverdueInvoiceDialog invoices={overdueInvoices} open={true} />
+      )}
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Invoices</h1>

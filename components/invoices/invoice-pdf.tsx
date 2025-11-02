@@ -11,14 +11,16 @@ import {
 } from '@react-pdf/renderer'
 import { formatIBAN, formatPhoneNumber } from '@/lib/formatters'
 
+// Register font with proper UTF-8 support for Polish & Norwegian characters
 Font.register({
   family: 'Roboto',
   fonts: [
     {
-      src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-regular-webfont.ttf',
+      src: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5WZLCzYlKw.ttf',
+      fontWeight: 'normal',
     },
     {
-      src: 'https://cdnjs.cloudflare.com/ajax/libs/ink/3.1.10/fonts/Roboto/roboto-bold-webfont.ttf',
+      src: 'https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlvAx05IsDqlA.ttf',
       fontWeight: 'bold',
     },
   ],
@@ -204,6 +206,9 @@ interface InvoicePDFProps {
     company_registration: string | null
     logo_url: string | null
     show_logo_on_invoice: boolean
+    pdf_language_polish: boolean
+    pdf_language_norwegian: boolean
+    pdf_language_english: boolean
   } | null
 }
 
@@ -225,6 +230,20 @@ export function InvoicePDF({
           },
         ]
 
+  // Language helpers
+  const pl = userProfile?.pdf_language_polish ?? true
+  const no = userProfile?.pdf_language_norwegian ?? true
+  const en = userProfile?.pdf_language_english ?? false
+
+  // Text builder helper
+  const buildText = (polish: string, norwegian: string, english: string) => {
+    const parts = []
+    if (pl) parts.push(polish)
+    if (no) parts.push(norwegian)
+    if (en) parts.push(english)
+    return parts.join(' / ')
+  }
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -234,28 +253,37 @@ export function InvoicePDF({
             <Image src={userProfile.logo_url} style={styles.logo} />
           )}
 
-        {/* Header - ONLY ONE */}
+        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>FAKTURA / INVOICE</Text>
+          <Text style={styles.title}>
+            {buildText('FAKTURA', 'FAKTURA', 'INVOICE')}
+          </Text>
           <Text style={styles.invoiceNumber}>
-            Nr / No: {invoice.invoice_number}
+            {buildText('Nr', 'No', 'No')}: {invoice.invoice_number}
           </Text>
         </View>
 
         {/* Dates */}
         <View style={styles.section}>
           <View style={styles.row}>
-            <Text style={styles.label}>Data wystawienia / Issue Date:</Text>
+            <Text style={styles.label}>
+              {buildText('Data wystawienia', 'Utstedelsesdato', 'Issue Date')}:
+            </Text>
             <Text style={styles.value}>
-              {new Date(invoice.issue_date).toLocaleDateString('pl-PL')} /{' '}
-              {new Date(invoice.issue_date).toLocaleDateString('en-GB')}
+              {new Date(invoice.issue_date).toLocaleDateString('pl-PL')}
+              {(no || en) &&
+                ' / ' +
+                  new Date(invoice.issue_date).toLocaleDateString('en-GB')}
             </Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Termin platnosci / Due Date:</Text>
+            <Text style={styles.label}>
+              {buildText('Termin płatności', 'Forfallsdato', 'Due Date')}:
+            </Text>
             <Text style={styles.value}>
-              {new Date(invoice.due_date).toLocaleDateString('pl-PL')} /{' '}
-              {new Date(invoice.due_date).toLocaleDateString('en-GB')}
+              {new Date(invoice.due_date).toLocaleDateString('pl-PL')}
+              {(no || en) &&
+                ' / ' + new Date(invoice.due_date).toLocaleDateString('en-GB')}
             </Text>
           </View>
         </View>
@@ -264,17 +292,25 @@ export function InvoicePDF({
 
         {/* Client Info */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Nabywca / Buyer</Text>
+          <Text style={styles.sectionTitle}>
+            {buildText('NABYWCA', 'KJØPER', 'BUYER')}
+          </Text>
           <View style={styles.row}>
-            <Text style={styles.label}>Nazwa / Name:</Text>
+            <Text style={styles.label}>
+              {buildText('Nazwa', 'Navn', 'Name')}:
+            </Text>
             <Text style={styles.value}>{invoice.clients?.name}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Org. nr. / Org. no.:</Text>
+            <Text style={styles.label}>
+              {buildText('Org. nr.', 'Org. nr.', 'Org. no.')}:
+            </Text>
             <Text style={styles.value}>{invoice.clients?.org_number}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Adres / Address:</Text>
+            <Text style={styles.label}>
+              {buildText('Adres', 'Adresse', 'Address')}:
+            </Text>
             <Text style={styles.value}>{invoice.clients?.address}</Text>
           </View>
         </View>
@@ -283,34 +319,46 @@ export function InvoicePDF({
 
         {/* Seller Info */}
         <View style={styles.sellerSection}>
-          <Text style={styles.sectionTitle}>Sprzedawca / Seller</Text>
+          <Text style={styles.sectionTitle}>
+            {buildText('SPRZEDAWCA', 'SELGER', 'SELLER')}
+          </Text>
           {userProfile?.business_name && (
             <View style={styles.row}>
-              <Text style={styles.label}>Firma / Business:</Text>
+              <Text style={styles.label}>
+                {buildText('Firma', 'Firma', 'Business')}:
+              </Text>
               <Text style={styles.value}>{userProfile.business_name}</Text>
             </View>
           )}
           {userProfile?.full_name && (
             <View style={styles.row}>
-              <Text style={styles.label}>Imie i nazwisko / Name:</Text>
+              <Text style={styles.label}>
+                {buildText('Imię i nazwisko', 'Navn', 'Name')}:
+              </Text>
               <Text style={styles.value}>{userProfile.full_name}</Text>
             </View>
           )}
           {userProfile?.tax_id && (
             <View style={styles.row}>
-              <Text style={styles.label}>NIP / Tax ID:</Text>
+              <Text style={styles.label}>
+                {buildText('NIP', 'NIP', 'Tax ID')}:
+              </Text>
               <Text style={styles.value}>{userProfile.tax_id}</Text>
             </View>
           )}
           {userProfile?.address && (
             <View style={styles.row}>
-              <Text style={styles.label}>Adres / Address:</Text>
+              <Text style={styles.label}>
+                {buildText('Adres', 'Adresse', 'Address')}:
+              </Text>
               <Text style={styles.value}>{userProfile.address}</Text>
             </View>
           )}
           {userProfile?.phone && (
             <View style={styles.row}>
-              <Text style={styles.label}>Telefon / Phone:</Text>
+              <Text style={styles.label}>
+                {buildText('Telefon', 'Telefon', 'Phone')}:
+              </Text>
               <Text style={styles.value}>
                 {formatPhoneNumber(userProfile.phone)}
               </Text>
@@ -325,7 +373,12 @@ export function InvoicePDF({
         {(userProfile?.bank_account || userProfile?.bank_name) && (
           <View style={styles.bankInfo}>
             <Text style={{ fontWeight: 'bold', marginBottom: 6 }}>
-              Dane do przelewu / Bank Details:
+              {buildText(
+                'Dane do przelewu',
+                'Betalingsdetaljer',
+                'Bank Details'
+              )}
+              :
             </Text>
             {userProfile?.bank_account && (
               <Text style={{ marginBottom: 2 }}>
@@ -334,7 +387,7 @@ export function InvoicePDF({
             )}
             {userProfile?.bank_name && (
               <Text style={{ marginBottom: 2 }}>
-                Bank: {userProfile.bank_name}
+                {buildText('Bank', 'Bank', 'Bank')}: {userProfile.bank_name}
               </Text>
             )}
             {userProfile?.swift_bic && (
@@ -352,13 +405,23 @@ export function InvoicePDF({
 
         <View style={styles.divider} />
 
-        {/* Services Section - NO DUPLICATE TITLE HERE */}
-        <Text style={styles.sectionTitle}>Uslugi / Services</Text>
+        {/* Services Section */}
+        <Text style={styles.sectionTitle}>
+          {buildText('USŁUGI', 'TJENESTER', 'SERVICES')}
+        </Text>
         <View style={styles.tableHeader}>
-          <Text style={styles.tableCol1}>Opis / Description</Text>
-          <Text style={styles.tableCol2}>Ilosc / Qty</Text>
-          <Text style={styles.tableCol3}>Cena / Price</Text>
-          <Text style={styles.tableCol4}>Kwota / Amount</Text>
+          <Text style={styles.tableCol1}>
+            {buildText('Opis', 'Beskrivelse', 'Description')}
+          </Text>
+          <Text style={styles.tableCol2}>
+            {buildText('Ilość', 'Antall', 'Qty')}
+          </Text>
+          <Text style={styles.tableCol3}>
+            {buildText('Cena', 'Pris', 'Price')}
+          </Text>
+          <Text style={styles.tableCol4}>
+            {buildText('Kwota', 'Beløp', 'Amount')}
+          </Text>
         </View>
         {items.map((item, index) => (
           <View key={index} style={styles.tableRow}>
@@ -382,7 +445,9 @@ export function InvoicePDF({
         {/* Total */}
         <View style={styles.total}>
           <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Suma netto / Subtotal:</Text>
+            <Text style={styles.totalLabel}>
+              {buildText('Suma netto', 'Subtotal', 'Subtotal')}:
+            </Text>
             <Text style={styles.totalLabel}>
               {invoice.amount.toLocaleString('nb-NO', {
                 minimumFractionDigits: 2,
@@ -397,7 +462,9 @@ export function InvoicePDF({
           </View>
           <View style={styles.divider} />
           <View style={styles.totalRow}>
-            <Text style={styles.totalAmount}>Suma brutto / Total:</Text>
+            <Text style={styles.totalAmount}>
+              {buildText('Suma brutto', 'Total', 'Total')}:
+            </Text>
             <Text style={styles.totalAmount}>
               {invoice.amount.toLocaleString('nb-NO', {
                 minimumFractionDigits: 2,
@@ -408,31 +475,50 @@ export function InvoicePDF({
           </View>
         </View>
 
-        {/* Reverse Charge Notice */}
+        {/* Reverse Charge Notice - THE MAGIC (NOW WITH PROPER CHARACTERS) */}
         <View style={styles.reverseCharge}>
           <Text style={styles.reverseChargeTitle}>
-            ODWROTNE OBCIAZENIE MVA / REVERSE CHARGE VAT
+            {buildText(
+              'ODWROTNE OBCIĄŻENIE MVA',
+              'SNUDD AVREGNING',
+              'REVERSE CHARGE VAT'
+            )}
           </Text>
-          <Text style={styles.reverseChargeText}>
-            POLSKI: Zgodnie z art. 28b ustawy o VAT, obowiazek rozliczenia
-            podatku VAT/MVA spoczywa na nabywcy uslug (odwrotne obciazenie).
-            Sprzedawca nie nalicza VAT.
-          </Text>
-          <Text style={styles.reverseChargeText}>
-            NORWEGIAN: I henhold til norsk merverdiavgiftslov par.11-3 (snudd
-            avregning / reverse charge), er kjoperen ansvarlig for a beregne og
-            rapportere MVA. Selgeren beregner ikke MVA.
-          </Text>
-          <Text style={styles.reverseChargeText}>
-            ENGLISH: According to the reverse charge mechanism (Article 28b VAT
-            Act / Norwegian VAT Act par.11-3), the buyer is responsible for
-            accounting for VAT/MVA. The seller does not charge VAT.
-          </Text>
+
+          {pl && (
+            <Text style={styles.reverseChargeText}>
+              [PL] POLSKI: Zgodnie z art. 28b ustawy o VAT, obowiązek
+              rozliczenia podatku VAT/MVA spoczywa na nabywcy usług (odwrotne
+              obciążenie). Sprzedawca nie nalicza VAT.
+            </Text>
+          )}
+
+          {no && (
+            <Text style={styles.reverseChargeText}>
+              [NO] NORSK: I henhold til norsk merverdiavgiftslov §11-3 (snudd
+              avregning / reverse charge), er kjøperen ansvarlig for å beregne
+              og rapportere MVA. Selgeren beregner ikke MVA.
+            </Text>
+          )}
+
+          {en && (
+            <Text style={styles.reverseChargeText}>
+              [EN] ENGLISH: According to the reverse charge mechanism (Article
+              28b VAT Act / Norwegian VAT Act §11-3), the buyer is responsible
+              for accounting for VAT/MVA. The seller does not charge VAT.
+            </Text>
+          )}
         </View>
 
         {/* Footer */}
         <Text style={styles.footer}>
-          Generated by Invo • {new Date().toLocaleDateString('pl-PL')}
+          {pl && 'Wygenerowane przez Invo'}
+          {pl && (no || en) && ' • '}
+          {no && 'Generert av Invo'}
+          {!pl && no && en && ' • '}
+          {en && !pl && !no && 'Generated by Invo'}
+          {' • '}
+          {new Date().toLocaleDateString('pl-PL')}
         </Text>
       </Page>
     </Document>

@@ -51,6 +51,8 @@ export interface Database {
           amount: number
           currency: string
           status: string
+          payment_received: boolean
+          payment_date: string | null
           created_at: string
           updated_at: string
         }
@@ -65,6 +67,8 @@ export interface Database {
           amount: number
           currency?: string
           status?: string
+          payment_received?: boolean
+          payment_date?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -79,6 +83,8 @@ export interface Database {
           amount?: number
           currency?: string
           status?: string
+          payment_received?: boolean
+          payment_date?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -133,6 +139,12 @@ export interface Database {
           show_logo_on_invoice: boolean
           invoice_prefix: string | null
           default_currency: string
+          pdf_language_polish: boolean
+          pdf_language_norwegian: boolean
+          pdf_language_english: boolean
+          last_overdue_check: string | null
+          mva_registered: boolean
+          last_mva_popup: string | null
           created_at: string
           updated_at: string
         }
@@ -153,6 +165,12 @@ export interface Database {
           show_logo_on_invoice?: boolean
           invoice_prefix: string | null
           default_currency: string
+          pdf_language_polish: boolean
+          pdf_language_norwegian: boolean
+          pdf_language_english: boolean
+          last_overdue_check?: string | null
+          mva_registered?: boolean
+          last_mva_popup?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -173,6 +191,12 @@ export interface Database {
           show_logo_on_invoice?: boolean
           invoice_prefix: string | null
           default_currency: string
+          pdf_language_polish: boolean
+          pdf_language_norwegian: boolean
+          pdf_language_english: boolean
+          last_overdue_check?: string | null
+          mva_registered?: boolean
+          last_mva_popup?: string | null
           created_at?: string
           updated_at?: string
         }

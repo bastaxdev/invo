@@ -74,7 +74,22 @@ export async function updateProfile(formData: FormData) {
     invoice_prefix: invoicePrefix,
     default_currency: (formData.get('default_currency') as string) || 'PLN',
     show_logo_on_invoice: formData.get('show_logo_on_invoice') === 'on',
+    pdf_language_polish: formData.get('pdf_language_polish') === 'on',
+    pdf_language_norwegian: formData.get('pdf_language_norwegian') === 'on',
+    pdf_language_english: formData.get('pdf_language_english') === 'on',
+    mva_registered: formData.get('mva_registered') === 'on',
     updated_at: new Date().toISOString(),
+  }
+
+  if (
+    !profileData.pdf_language_polish &&
+    !profileData.pdf_language_norwegian &&
+    !profileData.pdf_language_english
+  ) {
+    redirect(
+      '/dashboard/settings?error=' +
+        encodeURIComponent('Please select at least one language for invoices')
+    )
   }
 
   // Check if profile exists
@@ -104,5 +119,6 @@ export async function updateProfile(formData: FormData) {
   }
 
   revalidatePath('/dashboard/settings')
+  revalidatePath('/dashboard')
   redirect('/dashboard/settings?success=true')
 }

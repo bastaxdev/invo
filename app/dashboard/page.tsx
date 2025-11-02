@@ -1,4 +1,3 @@
-// app/dashboard/page.tsx
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
@@ -10,6 +9,17 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import Link from 'next/link'
+import {
+  getOverdueInvoices,
+  shouldShowOverdueCheck,
+} from '@/app/actions/invoices'
+import {
+  calculateLast12MonthsRevenueNOK,
+  shouldShowMVAPopup,
+} from '@/app/actions/mva'
+import { OverdueInvoiceDialog } from '@/components/invoices/overdue-invoice-dialog'
+import { MVAProgressBar } from '@/components/dashboard/mva-progress-bar'
+import { MVARegistrationPopup } from '@/components/dashboard/mva-registration-popup'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -32,12 +42,43 @@ export default async function DashboardPage() {
 
   const totalRevenue = invoices?.reduce((sum, inv) => sum + inv.amount, 0) || 0
 
+  // Check for overdue invoices
+  const showOverdueCheck = await shouldShowOverdueCheck()
+  const overdueInvoices = showOverdueCheck ? await getOverdueInvoices() : []
+
+  // MVA tracking
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('mva_registered')
+    .eq('user_id', user.id)
+    .single()
+
+  const revenueNOK = await calculateLast12MonthsRevenueNOK()
+  const showMVAPopup = await shouldShowMVAPopup()
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Overdue Invoice Dialog */}
+      {overdueInvoices.length > 0 && (
+        <OverdueInvoiceDialog invoices={overdueInvoices} open={true} />
+      )}
+
+      {/* MVA Registration Popup */}
+      {showMVAPopup && (
+        <MVARegistrationPopup revenueNOK={revenueNOK} open={true} />
+      )}
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
         <p className="mt-2 text-slate-600">Welcome back, {user.email}</p>
       </div>
+
+      {/* MVA Progress Bar - only show if not registered */}
+      {!profile?.mva_registered && (
+        <div className="mb-6">
+          <MVAProgressBar revenueNOK={revenueNOK} mvaRegistered={false} />
+        </div>
+      )}
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
