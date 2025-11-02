@@ -85,7 +85,7 @@ export default async function SettingsPage({
           <CardHeader>
             <CardTitle>Branding</CardTitle>
             <CardDescription>
-              Upload your company logo for invoices
+              Upload your company logo (optional)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -233,7 +233,10 @@ export default async function SettingsPage({
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="full_name">
-                    Full Name <span className="text-red-500">*</span>
+                    Full Name{' '}
+                    {!profile?.business_name && (
+                      <span className="text-red-500">*</span>
+                    )}
                   </Label>
                   <Input
                     id="full_name"
@@ -241,12 +244,18 @@ export default async function SettingsPage({
                     type="text"
                     placeholder="Jan Kowalski"
                     defaultValue={profile?.full_name || ''}
-                    required
+                    required={!profile?.business_name}
                   />
+                  <p className="text-xs text-slate-500">
+                    Required if Business Name is not provided
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="business_name">
-                    Business Name (Optional)
+                    Business Name{' '}
+                    {!profile?.full_name && (
+                      <span className="text-red-500">*</span>
+                    )}
                   </Label>
                   <Input
                     id="business_name"
@@ -254,7 +263,11 @@ export default async function SettingsPage({
                     type="text"
                     placeholder="Kowalski Consulting"
                     defaultValue={profile?.business_name || ''}
+                    required={!profile?.full_name}
                   />
+                  <p className="text-xs text-slate-500">
+                    Required if Full Name is not provided
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="invoice_prefix">
@@ -301,7 +314,7 @@ export default async function SettingsPage({
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="tax_id">Tax ID / NIP</Label>
+                  <Label htmlFor="tax_id">Tax ID / NIP (Optional)</Label>
                   <Input
                     id="tax_id"
                     name="tax_id"
@@ -325,13 +338,16 @@ export default async function SettingsPage({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">
+                  Phone Number <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="phone"
                   name="phone"
                   type="tel"
                   placeholder="+48 123 456 789"
                   defaultValue={profile?.phone || ''}
+                  required
                 />
                 <p className="text-xs text-slate-500">
                   Include country code (e.g., +48 for Poland, +47 for Norway)
@@ -357,13 +373,17 @@ export default async function SettingsPage({
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="bank_account">Bank Account / IBAN</Label>
+                    <Label htmlFor="bank_account">
+                      Bank Account / IBAN{' '}
+                      <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="bank_account"
                       name="bank_account"
                       type="text"
                       placeholder="PL61 1090 1014 0000 0712 1981 2874"
                       defaultValue={profile?.bank_account || ''}
+                      required
                     />
                     <p className="text-xs text-slate-500">
                       IBAN format recommended
@@ -372,35 +392,44 @@ export default async function SettingsPage({
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="bank_name">Bank Name</Label>
+                      <Label htmlFor="bank_name">
+                        Bank Name <span className="text-red-500">*</span>
+                      </Label>
                       <Input
                         id="bank_name"
                         name="bank_name"
                         type="text"
                         placeholder="PKO Bank Polski"
                         defaultValue={profile?.bank_name || ''}
+                        required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="swift_bic">SWIFT/BIC Code</Label>
+                      <Label htmlFor="swift_bic">
+                        SWIFT/BIC Code <span className="text-red-500">*</span>
+                      </Label>
                       <Input
                         id="swift_bic"
                         name="swift_bic"
                         type="text"
                         placeholder="BPKOPLPW"
                         defaultValue={profile?.swift_bic || ''}
+                        required
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="bank_address">Bank Address</Label>
+                    <Label htmlFor="bank_address">
+                      Bank Address <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="bank_address"
                       name="bank_address"
                       type="text"
                       placeholder="ul. Puławska 15, 02-515 Warszawa, Poland"
                       defaultValue={profile?.bank_address || ''}
+                      required
                     />
                   </div>
                 </div>

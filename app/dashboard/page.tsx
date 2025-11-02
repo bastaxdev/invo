@@ -49,12 +49,15 @@ export default async function DashboardPage() {
   // MVA tracking
   const { data: profile } = await supabase
     .from('user_profiles')
-    .select('mva_registered')
+    .select('mva_registered, full_name, business_name')
     .eq('user_id', user.id)
     .single()
 
   const revenueNOK = await calculateLast12MonthsRevenueNOK()
   const showMVAPopup = await shouldShowMVAPopup()
+
+  // Determine display name: Business Name > Full Name > Email
+  const displayName = profile?.business_name || profile?.full_name || user.email
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
