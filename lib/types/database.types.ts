@@ -15,9 +15,12 @@ export interface Database {
           id: string
           user_id: string
           name: string
-          org_number: string
+          org_number: string | null
           address: string
           country: string
+          email: string | null
+          phone: string | null
+          tax_id: string | null
           created_at: string
           updated_at: string
         }
@@ -25,9 +28,12 @@ export interface Database {
           id?: string
           user_id: string
           name: string
-          org_number: string
+          org_number?: string | null
           address: string
           country?: string
+          email?: string | null
+          phone?: string | null
+          tax_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -35,9 +41,12 @@ export interface Database {
           id?: string
           user_id?: string
           name?: string
-          org_number?: string
+          org_number?: string | null
           address?: string
           country?: string
+          email?: string | null
+          phone?: string | null
+          tax_id?: string | null
           created_at?: string
           updated_at?: string
         }
