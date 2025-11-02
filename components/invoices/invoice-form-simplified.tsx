@@ -1,7 +1,7 @@
 // components/invoices/invoice-form-simplified.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,13 +16,14 @@ import {
 } from '@/components/ui/select'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
-import { Trash2, Plus } from 'lucide-react'
+import { Trash2, Plus, AlertCircle } from 'lucide-react'
 
 interface Client {
   id: string
   name: string
   org_number: string
   address: string
+  country?: string
 }
 
 interface Template {
@@ -55,6 +56,8 @@ interface InvoiceFormProps {
   }
   invoiceItems?: InvoiceItem[]
   action: (formData: FormData) => Promise<void>
+  mvaRegistered: boolean
+  revenueExceeded: boolean
 }
 
 export function InvoiceFormSimplified({
@@ -63,9 +66,15 @@ export function InvoiceFormSimplified({
   invoice,
   invoiceItems,
   action,
+  mvaRegistered,
+  revenueExceeded,
 }: InvoiceFormProps) {
   const [useNewClient, setUseNewClient] = useState(false)
   const [currency, setCurrency] = useState(invoice?.currency || 'NOK')
+  const [selectedClientId, setSelectedClientId] = useState(
+    invoice?.client_id || ''
+  )
+  const [newClientCountry, setNewClientCountry] = useState('NO')
   const [items, setItems] = useState<InvoiceItem[]>(
     invoiceItems && invoiceItems.length > 0
       ? invoiceItems
@@ -86,6 +95,49 @@ export function InvoiceFormSimplified({
     .toISOString()
     .split('T')[0]
 
+  // Calculate VAT based on CORRECT Norwegian MVA law
+  const selectedClient = clients.find((c) => c.id === selectedClientId)
+  const clientCountry = useNewClient
+    ? newClientCountry
+    : selectedClient?.country || 'NO'
+
+  // STEP 1: Determine if VAT should be applied
+  let shouldApplyVAT = false
+  let vatNoticeType = ''
+  let showThresholdAlert = false
+
+  if (mvaRegistered) {
+    // USER IS REGISTERED - always charge VAT to Norwegian clients
+    if (clientCountry === 'NO') {
+      shouldApplyVAT = true
+      vatNoticeType = 'registered_charging_vat'
+    } else {
+      // Export: 0% VAT
+      shouldApplyVAT = false
+      vatNoticeType = 'export'
+    }
+  } else {
+    // USER IS NOT REGISTERED - check threshold
+    if (revenueExceeded) {
+      // Crossed threshold - MUST charge VAT and show alert
+      if (clientCountry === 'NO') {
+        shouldApplyVAT = true
+        vatNoticeType = 'not_registered_crossed_threshold'
+        showThresholdAlert = true
+      }
+    } else {
+      // Under threshold - no VAT
+      shouldApplyVAT = false
+      vatNoticeType = 'under_threshold'
+    }
+  }
+
+  const VAT_RATE = 25
+
+  const subtotal = items.reduce((sum, item) => sum + item.amount, 0)
+  const vatAmount = shouldApplyVAT ? (subtotal * VAT_RATE) / 100 : 0
+  const totalAmount = subtotal + vatAmount
+
   const loadTemplate = async (templateId: string) => {
     if (!templateId) return
 
@@ -94,14 +146,11 @@ export function InvoiceFormSimplified({
       const data = await response.json()
 
       if (data.template && data.items) {
-        // Set currency from template
         setCurrency(data.template.currency)
 
-        // Set due date based on default_due_days
         const dueDate = new Date()
         dueDate.setDate(dueDate.getDate() + data.template.default_due_days)
 
-        // Update due date field
         const dueDateInput = document.getElementById(
           'due_date'
         ) as HTMLInputElement
@@ -109,7 +158,6 @@ export function InvoiceFormSimplified({
           dueDateInput.value = dueDate.toISOString().split('T')[0]
         }
 
-        // Load template items
         const loadedItems = data.items.map((item: any) => ({
           description: item.description,
           quantity: item.quantity,
@@ -144,7 +192,6 @@ export function InvoiceFormSimplified({
     const newItems = [...items]
     newItems[index] = { ...newItems[index], [field]: value }
 
-    // Recalculate amount
     if (field === 'quantity' || field === 'unit_price') {
       newItems[index].amount =
         newItems[index].quantity * newItems[index].unit_price
@@ -153,19 +200,12 @@ export function InvoiceFormSimplified({
     setItems(newItems)
   }
 
-  const totalAmount = items.reduce((sum, item) => sum + item.amount, 0)
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
 
-    // Add items as JSON
     formData.set('items', JSON.stringify(items))
-
-    // Add total amount
-    formData.set('amount', totalAmount.toString())
-
-    // Add description (first item description or combined)
+    formData.set('amount', subtotal.toString())
     formData.set(
       'description',
       items.map((item) => item.description).join('; ')
@@ -198,6 +238,60 @@ export function InvoiceFormSimplified({
         </div>
       )}
 
+      {/* Threshold Crossed Alert */}
+      {showThresholdAlert && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-red-900">
+                ⚠️ CRITICAL: MVA Registration Required
+              </h3>
+              <p className="text-sm text-red-800 mt-1">
+                You have crossed the NOK 50,000 MVA threshold. You are{' '}
+                <strong>legally required</strong> to register for MVA
+                immediately. This invoice will include 25% VAT and will show:
+                "Selskapet er under registrering i Merverdiavgiftsregisteret."
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* VAT Info Banner - Registered */}
+      {mvaRegistered && shouldApplyVAT && (
+        <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-green-600 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-green-900">
+                25% Norwegian MVA will be applied
+              </h3>
+              <p className="text-sm text-green-800 mt-1">
+                You are registered for MVA. Norwegian VAT will automatically be
+                added to this invoice for Norwegian clients.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Export Banner */}
+      {mvaRegistered && !shouldApplyVAT && clientCountry !== 'NO' && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-blue-900">Export - 0% VAT</h3>
+              <p className="text-sm text-blue-800 mt-1">
+                This is an export sale (non-Norwegian client). VAT rate: 0%
+                (zero-rated export).
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Client Selection */}
       <div className="space-y-4 rounded-lg border p-4">
         <div className="flex items-center space-x-2">
@@ -205,7 +299,7 @@ export function InvoiceFormSimplified({
             id="use-new-client"
             checked={useNewClient}
             onCheckedChange={(checked) => setUseNewClient(checked === true)}
-            disabled={!!invoice} // Disable if editing
+            disabled={!!invoice}
           />
           <label
             htmlFor="use-new-client"
@@ -220,9 +314,10 @@ export function InvoiceFormSimplified({
             <Label htmlFor="client_id">Select Client</Label>
             <Select
               name="client_id"
-              defaultValue={invoice?.client_id}
+              value={selectedClientId}
+              onValueChange={setSelectedClientId}
               required={!useNewClient}
-              disabled={!!invoice} // Disable if editing
+              disabled={!!invoice}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a client" />
@@ -230,15 +325,14 @@ export function InvoiceFormSimplified({
               <SelectContent>
                 {clients.map((client) => (
                   <SelectItem key={client.id} value={client.id}>
-                    {client.name}
+                    {client.name} ({client.country || 'NO'})
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {invoice && (
               <p className="text-xs text-slate-500">
-                Client cannot be changed when editing. Edit client details in
-                Clients panel.
+                Client cannot be changed when editing.
               </p>
             )}
           </div>
@@ -274,6 +368,29 @@ export function InvoiceFormSimplified({
                 required={useNewClient}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="new_client_country">Country</Label>
+              <Select
+                name="new_client_country"
+                value={newClientCountry}
+                onValueChange={setNewClientCountry}
+                required={useNewClient}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NO">🇳🇴 Norway</SelectItem>
+                  <SelectItem value="PL">🇵🇱 Poland</SelectItem>
+                  <SelectItem value="SE">🇸🇪 Sweden</SelectItem>
+                  <SelectItem value="DK">🇩🇰 Denmark</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-slate-500">
+                VAT is only applied to Norwegian clients when you're MVA
+                registered
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -286,12 +403,10 @@ export function InvoiceFormSimplified({
             id="invoice_number"
             name="invoice_number"
             type="text"
-            placeholder="Auto-generated with your unique prefix (e.g., ABC1-001)"
+            placeholder="Auto-generated with your unique prefix"
             defaultValue={invoice?.invoice_number}
           />
-          <p className="text-xs text-slate-500">
-            Leave empty to auto-generate with your unique prefix
-          </p>
+          <p className="text-xs text-slate-500">Leave empty to auto-generate</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -424,8 +539,25 @@ export function InvoiceFormSimplified({
           </Card>
         ))}
 
-        <div className="rounded-lg border bg-slate-50 p-4">
-          <div className="flex justify-between text-lg font-bold">
+        {/* Totals */}
+        <div className="rounded-lg border bg-slate-50 p-4 space-y-2">
+          <div className="flex justify-between text-base">
+            <span className="font-medium">Subtotal:</span>
+            <span>
+              {subtotal.toFixed(2)} {currency}
+            </span>
+          </div>
+
+          {shouldApplyVAT && (
+            <div className="flex justify-between text-base text-green-700">
+              <span className="font-medium">Norwegian MVA (25%):</span>
+              <span>
+                {vatAmount.toFixed(2)} {currency}
+              </span>
+            </div>
+          )}
+
+          <div className="border-t pt-2 flex justify-between text-lg font-bold">
             <span>Total Amount:</span>
             <span>
               {totalAmount.toFixed(2)} {currency}

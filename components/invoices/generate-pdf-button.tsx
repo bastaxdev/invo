@@ -30,11 +30,16 @@ interface GeneratePDFButtonProps {
     due_date: string
     description: string
     amount: number
+    vat_rate?: number
+    vat_amount?: number
+    amount_with_vat?: number
     currency: string
+    mva_registered_at_creation?: boolean
     clients: {
       name: string
       org_number: string
       address: string
+      country?: string
     } | null
   }
   invoiceItems?: InvoiceItem[]
@@ -71,6 +76,15 @@ export function GeneratePDFButton({
     setIsGenerating(true)
     setError(null)
     try {
+      // DEBUG: Log what we're passing to PDF
+      console.log('Invoice data being passed to PDF:', {
+        invoice_number: invoice.invoice_number,
+        vat_rate: invoice.vat_rate,
+        mva_registered_at_creation: invoice.mva_registered_at_creation,
+        has_vat_field: 'vat_rate' in invoice,
+        has_mva_field: 'mva_registered_at_creation' in invoice,
+      })
+
       const blob = await pdf(
         <InvoicePDF
           invoice={invoice}

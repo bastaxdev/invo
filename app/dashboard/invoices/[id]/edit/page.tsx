@@ -1,15 +1,8 @@
-// app/dashboard/invoices/[id]/edit/page.tsx
 import { redirect } from 'next/navigation'
-import { createClient as createSupabaseClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { updateInvoice } from '@/app/actions/invoices'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { InvoiceFormSimplified } from '@/components/invoices/invoice-form-simplified'
+import { calculateLast12MonthsRevenueNOK } from '@/app/actions/mva'
 
 export default async function EditInvoicePage({
   params,
@@ -19,8 +12,8 @@ export default async function EditInvoicePage({
   searchParams: Promise<{ error?: string }>
 }) {
   const { id } = await params
-  const params2 = await searchParams
-  const supabase = await createSupabaseClient()
+  const queryParams = await searchParams
+  const supabase = await createClient()
 
   const {
     data: { user },
@@ -30,6 +23,7 @@ export default async function EditInvoicePage({
     redirect('/login')
   }
 
+  // Fetch the invoice
   const { data: invoice } = await supabase
     .from('invoices')
     .select('*')
@@ -38,43 +32,56 @@ export default async function EditInvoicePage({
     .single()
 
   if (!invoice) {
-    redirect('/dashboard/invoices')
+    redirect('/dashboard/invoices?error=Invoice not found')
   }
 
-  const { data: clients } = await supabase
-    .from('clients')
-    .select('*')
-    .order('name')
-
+  // Fetch invoice items
   const { data: invoiceItems } = await supabase
     .from('invoice_items')
     .select('*')
     .eq('invoice_id', id)
-    .order('sort_order')
+    .order('sort_order', { ascending: true })
 
-  const updateInvoiceWithId = updateInvoice.bind(null, id)
+  // Fetch clients
+  const { data: clients } = await supabase
+    .from('clients')
+    .select('*')
+    .order('name', { ascending: true })
+
+  // Get MVA status
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('mva_registered')
+    .eq('user_id', user.id)
+    .single()
+
+  const mvaRegistered = profile?.mva_registered || false
+  const revenueNOK = await calculateLast12MonthsRevenueNOK()
+  const revenueExceeded = revenueNOK >= 50000
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Edit Invoice</CardTitle>
-          <CardDescription>Update invoice information</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {params2.error && (
-            <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
-              {params2.error}
-            </div>
-          )}
-          <InvoiceFormSimplified
-            clients={clients || []}
-            invoice={invoice}
-            invoiceItems={invoiceItems || undefined}
-            action={updateInvoiceWithId}
-          />
-        </CardContent>
-      </Card>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-slate-900">Edit Invoice</h1>
+        <p className="mt-2 text-slate-600">
+          Update invoice {invoice.invoice_number}
+        </p>
+      </div>
+
+      {queryParams.error && (
+        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+          {queryParams.error}
+        </div>
+      )}
+
+      <InvoiceFormSimplified
+        clients={clients || []}
+        invoice={invoice}
+        invoiceItems={invoiceItems || []}
+        action={updateInvoice.bind(null, id)}
+        mvaRegistered={mvaRegistered}
+        revenueExceeded={revenueExceeded}
+      />
     </div>
   )
 }

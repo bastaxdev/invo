@@ -22,7 +22,7 @@ import { OverdueInvoiceDialog } from '@/components/invoices/overdue-invoice-dial
 export default async function InvoicesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>
+  searchParams: Promise<{ error?: string; alert?: string }>
 }) {
   const params = await searchParams
   const supabase = await createClient()
@@ -68,6 +68,12 @@ export default async function InvoicesPage({
         </Link>
       </div>
 
+      {params.alert && (
+        <div className="mt-4 rounded-md bg-red-50 border-2 border-red-400 p-4 text-sm text-red-800">
+          <strong>⚠️ URGENT:</strong> {params.alert}
+        </div>
+      )}
+
       {params.error && (
         <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
           {params.error}
@@ -89,51 +95,80 @@ export default async function InvoicesPage({
                   <TableHead>Invoice #</TableHead>
                   <TableHead>Client</TableHead>
                   <TableHead>Issue Date</TableHead>
-                  <TableHead>Amount</TableHead>
+                  <TableHead>Subtotal</TableHead>
+                  <TableHead>VAT</TableHead>
+                  <TableHead>Total</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {invoices.map((invoice) => (
-                  <TableRow key={invoice.id}>
-                    <TableCell className="font-medium">
-                      {invoice.invoice_number}
-                    </TableCell>
-                    <TableCell>{invoice.clients?.name || 'N/A'}</TableCell>
-                    <TableCell>
-                      {new Date(invoice.issue_date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      {invoice.amount.toLocaleString('nb-NO', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}{' '}
-                      {invoice.currency}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={invoice.status} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Link href={`/dashboard/invoices/${invoice.id}`}>
-                          <Button variant="outline" size="sm">
-                            View
-                          </Button>
-                        </Link>
-                        <Link href={`/dashboard/invoices/${invoice.id}/edit`}>
-                          <Button variant="outline" size="sm">
-                            Edit
-                          </Button>
-                        </Link>
-                        <DeleteInvoiceButton
-                          id={invoice.id}
-                          invoiceNumber={invoice.invoice_number}
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {invoices.map((invoice) => {
+                  const vatRate = invoice.vat_rate || 0
+                  const vatAmount = invoice.vat_amount || 0
+                  const total = invoice.amount_with_vat || invoice.amount
+
+                  return (
+                    <TableRow key={invoice.id}>
+                      <TableCell className="font-medium">
+                        {invoice.invoice_number}
+                      </TableCell>
+                      <TableCell>{invoice.clients?.name || 'N/A'}</TableCell>
+                      <TableCell>
+                        {new Date(invoice.issue_date).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {invoice.amount.toLocaleString('nb-NO', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}{' '}
+                        {invoice.currency}
+                      </TableCell>
+                      <TableCell>
+                        {vatRate > 0 ? (
+                          <span className="text-green-700 font-medium">
+                            {vatRate}% (
+                            {vatAmount.toLocaleString('nb-NO', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
+                            )
+                          </span>
+                        ) : (
+                          <span className="text-slate-500">0%</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-semibold">
+                        {total.toLocaleString('nb-NO', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}{' '}
+                        {invoice.currency}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={invoice.status} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Link href={`/dashboard/invoices/${invoice.id}`}>
+                            <Button variant="outline" size="sm">
+                              View
+                            </Button>
+                          </Link>
+                          <Link href={`/dashboard/invoices/${invoice.id}/edit`}>
+                            <Button variant="outline" size="sm">
+                              Edit
+                            </Button>
+                          </Link>
+                          <DeleteInvoiceButton
+                            id={invoice.id}
+                            invoiceNumber={invoice.invoice_number}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
               </TableBody>
             </Table>
           </div>

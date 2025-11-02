@@ -1,4 +1,3 @@
-// components/invoices/invoice-pdf.tsx
 import React from 'react'
 import {
   Document,
@@ -148,6 +147,26 @@ const styles = StyleSheet.create({
     color: '#78350f',
     marginBottom: 6,
   },
+  vatNotice: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#d1fae5',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#10b981',
+  },
+  vatNoticeTitle: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#065f46',
+  },
+  vatNoticeText: {
+    fontSize: 9,
+    lineHeight: 1.5,
+    color: '#047857',
+    marginBottom: 6,
+  },
   footer: {
     position: 'absolute',
     bottom: 30,
@@ -182,11 +201,16 @@ interface InvoicePDFProps {
     due_date: string
     description: string
     amount: number
+    vat_rate?: number
+    vat_amount?: number
+    amount_with_vat?: number
     currency: string
+    mva_registered_at_creation?: boolean
     clients: {
       name: string
       org_number: string
       address: string
+      country?: string
     } | null
   }
   invoiceItems?: InvoiceItem[]
@@ -235,6 +259,16 @@ export function InvoicePDF({
   const no = userProfile?.pdf_language_norwegian ?? true
   const en = userProfile?.pdf_language_english ?? false
 
+  // VAT info from invoice (stored at creation)
+  const hasVAT = (invoice.vat_rate ?? 0) > 0
+  const vatRate = invoice.vat_rate ?? 0
+  const vatAmount = invoice.vat_amount ?? 0
+  const subtotal = invoice.amount
+  const total = invoice.amount_with_vat ?? invoice.amount
+  const isNorwegianClient =
+    invoice.clients?.country === 'NO' || !invoice.clients?.country
+  const wasRegisteredAtCreation = invoice.mva_registered_at_creation === true
+
   // Text builder helper
   const buildText = (polish: string, norwegian: string, english: string) => {
     const parts = []
@@ -247,7 +281,7 @@ export function InvoicePDF({
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* Logo in top right - only if enabled */}
+        {/* Logo in top right */}
         {userProfile?.logo_url &&
           userProfile?.show_logo_on_invoice !== false && (
             <Image src={userProfile.logo_url} style={styles.logo} />
@@ -449,7 +483,7 @@ export function InvoicePDF({
               {buildText('Suma netto', 'Subtotal', 'Subtotal')}:
             </Text>
             <Text style={styles.totalLabel}>
-              {invoice.amount.toLocaleString('nb-NO', {
+              {subtotal.toLocaleString('nb-NO', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}{' '}
@@ -457,8 +491,16 @@ export function InvoicePDF({
             </Text>
           </View>
           <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>VAT / MVA:</Text>
-            <Text style={styles.totalLabel}>0.00 {invoice.currency}</Text>
+            <Text style={styles.totalLabel}>
+              MVA / VAT {hasVAT && `(${vatRate}%)`}:
+            </Text>
+            <Text style={styles.totalLabel}>
+              {vatAmount.toLocaleString('nb-NO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{' '}
+              {invoice.currency}
+            </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.totalRow}>
@@ -466,7 +508,7 @@ export function InvoicePDF({
               {buildText('Suma brutto', 'Total', 'Total')}:
             </Text>
             <Text style={styles.totalAmount}>
-              {invoice.amount.toLocaleString('nb-NO', {
+              {total.toLocaleString('nb-NO', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}{' '}
@@ -475,40 +517,135 @@ export function InvoicePDF({
           </View>
         </View>
 
-        {/* Reverse Charge Notice - THE MAGIC (NOW WITH PROPER CHARACTERS) */}
-        <View style={styles.reverseCharge}>
-          <Text style={styles.reverseChargeTitle}>
-            {buildText(
-              'ODWROTNE OBCIĄŻENIE MVA',
-              'SNUDD AVREGNING',
-              'REVERSE CHARGE VAT'
+        {/* VAT NOTICE - SINGLE CONDITIONAL BLOCK */}
+        {hasVAT && isNorwegianClient && (
+          <View style={styles.vatNotice}>
+            <Text style={styles.vatNoticeTitle}>
+              {wasRegisteredAtCreation
+                ? buildText(
+                    'NORWESKA MVA ZASTOSOWANA',
+                    'NORSK MVA PÅLAGT',
+                    'NORWEGIAN VAT APPLIED'
+                  )
+                : buildText(
+                    'MVA - W TRAKCIE REJESTRACJI',
+                    'MVA - UNDER REGISTRERING',
+                    'VAT - UNDER REGISTRATION'
+                  )}
+            </Text>
+
+            {wasRegisteredAtCreation ? (
+              <>
+                {pl && (
+                  <Text style={styles.vatNoticeText}>
+                    [PL] Niniejsza faktura zawiera 25% norweskiej MVA
+                    (merverdiavgift). Sprzedawca jest zarejestrowany w norweskim
+                    rejestrze MVA.
+                  </Text>
+                )}
+                {no && (
+                  <Text style={styles.vatNoticeText}>
+                    [NO] Denne fakturaen inkluderer 25% norsk MVA
+                    (merverdiavgift). Selgeren er registrert i det norske
+                    MVA-registeret.
+                  </Text>
+                )}
+                {en && (
+                  <Text style={styles.vatNoticeText}>
+                    [EN] This invoice includes 25% Norwegian VAT. The seller is
+                    registered in the Norwegian MVA Register.
+                  </Text>
+                )}
+              </>
+            ) : (
+              <>
+                {pl && (
+                  <Text style={styles.vatNoticeText}>
+                    [PL] Niniejsza faktura zawiera 25% norweskiej MVA. Selskapet
+                    er under registrering i Merverdiavgiftsregisteret.
+                  </Text>
+                )}
+                {no && (
+                  <Text style={styles.vatNoticeText}>
+                    [NO] Denne fakturaen inkluderer 25% norsk MVA. Selskapet er
+                    under registrering i Merverdiavgiftsregisteret.
+                  </Text>
+                )}
+                {en && (
+                  <Text style={styles.vatNoticeText}>
+                    [EN] This invoice includes 25% Norwegian VAT. Selskapet er
+                    under registrering i Merverdiavgiftsregisteret.
+                  </Text>
+                )}
+              </>
             )}
-          </Text>
+          </View>
+        )}
 
-          {pl && (
-            <Text style={styles.reverseChargeText}>
-              [PL] POLSKI: Zgodnie z art. 28b ustawy o VAT, obowiązek
-              rozliczenia podatku VAT/MVA spoczywa na nabywcy usług (odwrotne
-              obciążenie). Sprzedawca nie nalicza VAT.
+        {/* Reverse Charge - NOT REGISTERED, UNDER THRESHOLD */}
+        {!hasVAT && isNorwegianClient && (
+          <View style={styles.reverseCharge}>
+            <Text style={styles.reverseChargeTitle}>
+              {buildText(
+                'ODWROTNE OBCIĄŻENIE MVA',
+                'SNUDD AVREGNING',
+                'REVERSE CHARGE VAT'
+              )}
             </Text>
-          )}
+            {pl && (
+              <Text style={styles.reverseChargeText}>
+                [PL] Zgodnie z art. 28b ustawy o VAT, obowiązek rozliczenia
+                podatku VAT/MVA spoczywa na nabywcy usług (odwrotne obciążenie).
+                Sprzedawca nie jest zarejestrowany do MVA.
+              </Text>
+            )}
+            {no && (
+              <Text style={styles.reverseChargeText}>
+                [NO] I henhold til norsk merverdiavgiftslov §11-3 (snudd
+                avregning / reverse charge), er kjøperen ansvarlig for å beregne
+                og rapportere MVA. Selgeren er ikke registrert for MVA.
+              </Text>
+            )}
+            {en && (
+              <Text style={styles.reverseChargeText}>
+                [EN] According to the reverse charge mechanism (Article 28b VAT
+                Act / Norwegian VAT Act §11-3), the buyer is responsible for
+                accounting for VAT/MVA. The seller is not registered for MVA.
+              </Text>
+            )}
+          </View>
+        )}
 
-          {no && (
-            <Text style={styles.reverseChargeText}>
-              [NO] NORSK: I henhold til norsk merverdiavgiftslov §11-3 (snudd
-              avregning / reverse charge), er kjøperen ansvarlig for å beregne
-              og rapportere MVA. Selgeren beregner ikke MVA.
+        {/* Export Notice */}
+        {!isNorwegianClient && (
+          <View style={styles.vatNotice}>
+            <Text style={styles.vatNoticeTitle}>
+              {buildText(
+                'EKSPORT - 0% MVA',
+                'EKSPORT - 0% MVA',
+                'EXPORT - 0% VAT'
+              )}
             </Text>
-          )}
-
-          {en && (
-            <Text style={styles.reverseChargeText}>
-              [EN] ENGLISH: According to the reverse charge mechanism (Article
-              28b VAT Act / Norwegian VAT Act §11-3), the buyer is responsible
-              for accounting for VAT/MVA. The seller does not charge VAT.
-            </Text>
-          )}
-        </View>
+            {pl && (
+              <Text style={styles.vatNoticeText}>
+                [PL] Sprzedaż eksportowa - stawka 0% MVA zgodnie z norweskimi
+                przepisami podatkowymi.
+              </Text>
+            )}
+            {no && (
+              <Text style={styles.vatNoticeText}>
+                [NO] Eksport av tjenester/varer - 0% MVA i henhold til norske
+                skatteregler.
+              </Text>
+            )}
+            {en && (
+              <Text style={styles.vatNoticeText}>
+                [EN] Export of services/goods - 0% VAT in accordance with
+                Norwegian tax regulations.
+              </Text>
+            )}
+          </View>
+        )}
 
         {/* Footer */}
         <Text style={styles.footer}>

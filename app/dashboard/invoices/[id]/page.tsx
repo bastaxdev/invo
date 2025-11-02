@@ -34,7 +34,8 @@ export default async function InvoiceViewPage({
         id,
         name,
         org_number,
-        address
+        address,
+        country
       )
     `
     )
@@ -57,6 +58,10 @@ export default async function InvoiceViewPage({
     .select('*')
     .eq('user_id', user.id)
     .single()
+
+  const vatRate = invoice.vat_rate ?? 0
+  const vatAmount = invoice.vat_amount ?? 0
+  const total = invoice.amount_with_vat ?? invoice.amount
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -102,16 +107,50 @@ export default async function InvoiceViewPage({
               <p className="text-sm font-medium text-slate-500">Due Date</p>
               <p>{new Date(invoice.due_date).toLocaleDateString()}</p>
             </div>
-            <div>
-              <p className="text-sm font-medium text-slate-500">Amount</p>
-              <p className="text-2xl font-bold">
-                {invoice.amount.toLocaleString('nb-NO', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}{' '}
-                {invoice.currency}
-              </p>
+
+            {/* Amount Breakdown with VAT */}
+            <div className="space-y-2 border-t pt-4">
+              <div className="flex justify-between">
+                <p className="text-sm font-medium text-slate-500">Subtotal:</p>
+                <p className="font-medium">
+                  {invoice.amount.toLocaleString('nb-NO', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{' '}
+                  {invoice.currency}
+                </p>
+              </div>
+
+              {vatRate > 0 ? (
+                <div className="flex justify-between text-green-700">
+                  <p className="text-sm font-medium">VAT ({vatRate}%):</p>
+                  <p className="font-medium">
+                    {vatAmount.toLocaleString('nb-NO', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{' '}
+                    {invoice.currency}
+                  </p>
+                </div>
+              ) : (
+                <div className="flex justify-between text-slate-500">
+                  <p className="text-sm font-medium">VAT:</p>
+                  <p className="font-medium">0%</p>
+                </div>
+              )}
+
+              <div className="flex justify-between border-t pt-2">
+                <p className="text-sm font-semibold text-slate-700">Total:</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {total.toLocaleString('nb-NO', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{' '}
+                  {invoice.currency}
+                </p>
+              </div>
             </div>
+
             <div>
               <p className="text-sm font-medium text-slate-500">Status</p>
               <div className="mt-1">

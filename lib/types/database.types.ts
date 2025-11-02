@@ -17,6 +17,7 @@ export interface Database {
           name: string
           org_number: string
           address: string
+          country: string
           created_at: string
           updated_at: string
         }
@@ -26,6 +27,7 @@ export interface Database {
           name: string
           org_number: string
           address: string
+          country?: string
           created_at?: string
           updated_at?: string
         }
@@ -35,6 +37,7 @@ export interface Database {
           name?: string
           org_number?: string
           address?: string
+          country?: string
           created_at?: string
           updated_at?: string
         }
@@ -49,10 +52,14 @@ export interface Database {
           due_date: string
           description: string
           amount: number
+          vat_rate: number
+          vat_amount: number
+          amount_with_vat: number
           currency: string
           status: string
           payment_received: boolean
           payment_date: string | null
+          mva_registered_at_creation: boolean
           created_at: string
           updated_at: string
         }
@@ -65,10 +72,14 @@ export interface Database {
           due_date: string
           description: string
           amount: number
+          vat_rate?: number
+          vat_amount?: number
+          amount_with_vat?: number
           currency?: string
           status?: string
           payment_received?: boolean
           payment_date?: string | null
+          mva_registered_at_creation?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -81,10 +92,14 @@ export interface Database {
           due_date?: string
           description?: string
           amount?: number
+          vat_rate?: number
+          vat_amount?: number
+          amount_with_vat?: number
           currency?: string
           status?: string
           payment_received?: boolean
           payment_date?: string | null
+          mva_registered_at_creation?: boolean
           created_at?: string
           updated_at?: string
         }
