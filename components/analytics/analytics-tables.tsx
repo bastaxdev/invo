@@ -48,55 +48,71 @@ export function AnalyticsTables({
   isLoading,
 }: AnalyticsTablesProps) {
   return (
-    <div className="grid gap-6 lg:grid-cols-2 mb-8">
+    <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2 mb-6 sm:mb-8">
       {/* Monthly Breakdown */}
       <Card>
-        <CardHeader>
-          <CardTitle>Monthly Breakdown</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base sm:text-lg">
+            Monthly Breakdown
+          </CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Paid invoices per month in {displayCurrency}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {Object.keys(monthlyData).length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Month</TableHead>
-                  <TableHead className="text-right">Count</TableHead>
-                  <TableHead className="text-right">Net</TableHead>
-                  <TableHead className="text-right">VAT</TableHead>
-                  <TableHead className="text-right">Gross</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Object.entries(monthlyData)
-                  .slice(0, 6)
-                  .map(([month, data]) => (
-                    <TableRow key={month}>
-                      <TableCell className="font-medium">{month}</TableCell>
-                      <TableCell className="text-right">{data.count}</TableCell>
-                      <TableCell className="text-right">
-                        {isLoading
-                          ? '...'
-                          : formatCurrency(data.netAmount, displayCurrency)}
-                      </TableCell>
-                      <TableCell className="text-right text-slate-600">
-                        {isLoading
-                          ? '...'
-                          : formatCurrency(data.vatAmount, displayCurrency)}
-                      </TableCell>
-                      <TableCell className="text-right font-semibold">
-                        {isLoading
-                          ? '...'
-                          : formatCurrency(data.grossAmount, displayCurrency)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto -mx-2 sm:mx-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs sm:text-sm">Month</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">
+                      Count
+                    </TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">
+                      Net
+                    </TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">
+                      VAT
+                    </TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">
+                      Gross
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {Object.entries(monthlyData)
+                    .slice(0, 6)
+                    .map(([month, data]) => (
+                      <TableRow key={month}>
+                        <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">
+                          {month}
+                        </TableCell>
+                        <TableCell className="text-right text-xs sm:text-sm">
+                          {data.count}
+                        </TableCell>
+                        <TableCell className="text-right text-xs sm:text-sm whitespace-nowrap">
+                          {isLoading
+                            ? '...'
+                            : formatCurrency(data.netAmount, displayCurrency)}
+                        </TableCell>
+                        <TableCell className="text-right text-slate-600 text-xs sm:text-sm whitespace-nowrap">
+                          {isLoading
+                            ? '...'
+                            : formatCurrency(data.vatAmount, displayCurrency)}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold text-xs sm:text-sm whitespace-nowrap">
+                          {isLoading
+                            ? '...'
+                            : formatCurrency(data.grossAmount, displayCurrency)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
-            <p className="text-center text-slate-500 py-8">
+            <p className="text-center text-slate-500 py-8 text-sm">
               No paid invoices yet
             </p>
           )}
@@ -105,44 +121,56 @@ export function AnalyticsTables({
 
       {/* Top Clients */}
       <Card>
-        <CardHeader>
-          <CardTitle>Top Clients</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base sm:text-lg">Top Clients</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             By paid revenue in {displayCurrency}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {topClients.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Client</TableHead>
-                  <TableHead className="text-right">Invoices</TableHead>
-                  <TableHead className="text-right">Net</TableHead>
-                  <TableHead className="text-right">Gross</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {topClients.map(([name, data]) => (
-                  <TableRow key={name}>
-                    <TableCell className="font-medium">{name}</TableCell>
-                    <TableCell className="text-right">{data.count}</TableCell>
-                    <TableCell className="text-right">
-                      {isLoading
-                        ? '...'
-                        : formatCurrency(data.netAmount, displayCurrency)}
-                    </TableCell>
-                    <TableCell className="text-right font-semibold">
-                      {isLoading
-                        ? '...'
-                        : formatCurrency(data.grossAmount, displayCurrency)}
-                    </TableCell>
+            <div className="overflow-x-auto -mx-2 sm:mx-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs sm:text-sm">Client</TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">
+                      Invoices
+                    </TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">
+                      Net
+                    </TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm">
+                      Gross
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {topClients.map(([name, data]) => (
+                    <TableRow key={name}>
+                      <TableCell className="font-medium text-xs sm:text-sm">
+                        {name}
+                      </TableCell>
+                      <TableCell className="text-right text-xs sm:text-sm">
+                        {data.count}
+                      </TableCell>
+                      <TableCell className="text-right text-xs sm:text-sm whitespace-nowrap">
+                        {isLoading
+                          ? '...'
+                          : formatCurrency(data.netAmount, displayCurrency)}
+                      </TableCell>
+                      <TableCell className="text-right font-semibold text-xs sm:text-sm whitespace-nowrap">
+                        {isLoading
+                          ? '...'
+                          : formatCurrency(data.grossAmount, displayCurrency)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
-            <p className="text-center text-slate-500 py-8">
+            <p className="text-center text-slate-500 py-8 text-sm">
               No paid invoices yet
             </p>
           )}

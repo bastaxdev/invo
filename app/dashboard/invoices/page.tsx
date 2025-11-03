@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
 import { DeleteInvoiceButton } from '@/components/invoices/delete-invoice-button'
 import { StatusBadge } from '@/components/invoices/status-badge'
@@ -18,6 +19,7 @@ import {
   shouldShowOverdueCheck,
 } from '@/app/actions/invoices'
 import { OverdueInvoiceDialog } from '@/components/invoices/overdue-invoice-dialog'
+import { FileText, Calendar, DollarSign } from 'lucide-react'
 
 export default async function InvoicesPage({
   searchParams,
@@ -52,43 +54,159 @@ export default async function InvoicesPage({
   const overdueInvoices = showOverdueCheck ? await getOverdueInvoices() : []
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:py-8 sm:px-6 lg:px-8">
       {/* Overdue Invoice Dialog */}
       {overdueInvoices.length > 0 && (
         <OverdueInvoiceDialog invoices={overdueInvoices} open={true} />
       )}
 
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Invoices</h1>
-          <p className="mt-2 text-slate-600">Manage your invoices</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+            Invoices
+          </h1>
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-600">
+            Manage your invoices
+          </p>
         </div>
         <Link href="/dashboard/invoices/new">
-          <Button>Create Invoice</Button>
+          <Button className="w-full sm:w-auto">Create Invoice</Button>
         </Link>
       </div>
 
+      {/* Alerts */}
       {params.alert && (
-        <div className="mt-4 rounded-md bg-red-50 border-2 border-red-400 p-4 text-sm text-red-800">
+        <div className="mb-4 rounded-md bg-red-50 border-2 border-red-400 p-4 text-sm text-red-800">
           <strong>⚠️ URGENT:</strong> {params.alert}
         </div>
       )}
 
       {params.error && (
-        <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
           {params.error}
         </div>
       )}
 
-      <div className="mt-8">
-        {!invoices || invoices.length === 0 ? (
-          <div className="rounded-lg border border-slate-200 bg-white p-12 text-center">
+      {/* Content */}
+      {!invoices || invoices.length === 0 ? (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <FileText className="mx-auto h-12 w-12 text-slate-400 mb-4" />
             <p className="text-slate-500">
               No invoices yet. Create your first invoice!
             </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {/* Mobile Card View */}
+          <div className="lg:hidden space-y-4">
+            {invoices.map((invoice) => {
+              const vatRate = invoice.vat_rate || 0
+              const vatAmount = invoice.vat_amount || 0
+              const total = invoice.amount_with_vat || invoice.amount
+
+              return (
+                <Card key={invoice.id} className="overflow-hidden">
+                  <CardContent className="p-4">
+                    {/* Header Row */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className="font-semibold text-slate-900 text-base">
+                          {invoice.invoice_number}
+                        </p>
+                        <p className="text-sm text-slate-600 mt-0.5">
+                          {invoice.clients?.name || 'N/A'}
+                        </p>
+                      </div>
+                      <StatusBadge status={invoice.status} />
+                    </div>
+
+                    {/* Details Grid */}
+                    <div className="space-y-2 mb-3 text-sm">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-600 flex items-center gap-1.5">
+                          <Calendar className="h-3.5 w-3.5" />
+                          Issue Date
+                        </span>
+                        <span className="font-medium">
+                          {new Date(invoice.issue_date).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-600">Subtotal</span>
+                        <span className="font-medium">
+                          {invoice.amount.toLocaleString('nb-NO', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{' '}
+                          {invoice.currency}
+                        </span>
+                      </div>
+
+                      {vatRate > 0 && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-600">
+                            VAT ({vatRate}%)
+                          </span>
+                          <span className="font-medium text-green-700">
+                            {vatAmount.toLocaleString('nb-NO', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}{' '}
+                            {invoice.currency}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="flex justify-between items-center pt-2 border-t">
+                        <span className="text-slate-900 font-semibold flex items-center gap-1.5">
+                          <DollarSign className="h-4 w-4" />
+                          Total
+                        </span>
+                        <span className="font-bold text-slate-900">
+                          {total.toLocaleString('nb-NO', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}{' '}
+                          {invoice.currency}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 pt-3 border-t">
+                      <Link
+                        href={`/dashboard/invoices/${invoice.id}`}
+                        className="flex-1"
+                      >
+                        <Button variant="outline" size="sm" className="w-full">
+                          View
+                        </Button>
+                      </Link>
+                      <Link
+                        href={`/dashboard/invoices/${invoice.id}/edit`}
+                        className="flex-1"
+                      >
+                        <Button variant="outline" size="sm" className="w-full">
+                          Edit
+                        </Button>
+                      </Link>
+                      <DeleteInvoiceButton
+                        id={invoice.id}
+                        invoiceNumber={invoice.invoice_number}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
-        ) : (
-          <div className="rounded-lg border border-slate-200 bg-white">
+
+          {/* Desktop Table View */}
+          <div className="hidden lg:block rounded-lg border border-slate-200 bg-white overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -172,8 +290,8 @@ export default async function InvoicesPage({
               </TableBody>
             </Table>
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   )
 }

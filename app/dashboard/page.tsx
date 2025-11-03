@@ -56,14 +56,11 @@ export default async function DashboardPage() {
   const revenueNOK = await calculateLast12MonthsRevenueNOK()
   const showMVAPopup = await shouldShowMVAPopup()
 
-  // Determine display name logic:
-  // 1. If business_name exists, use it (company takes priority)
-  // 2. Else if full_name exists, use it
-  // 3. Else use email (for newly registered users who haven't completed profile)
+  // Determine display name logic
   const displayName = profile?.business_name || profile?.full_name || user.email
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       {/* Overdue Invoice Dialog */}
       {overdueInvoices.length > 0 && (
         <OverdueInvoiceDialog invoices={overdueInvoices} open={true} />
@@ -74,76 +71,94 @@ export default async function DashboardPage() {
         <MVARegistrationPopup revenueNOK={revenueNOK} open={true} />
       )}
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-        <p className="mt-2 text-slate-600">Welcome back, {displayName}</p>
+      {/* Header */}
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+          Dashboard
+        </h1>
+        <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-600 truncate">
+          Welcome back, {displayName}
+        </p>
       </div>
 
       {/* MVA Progress Bar - only show if not registered */}
       {!profile?.mva_registered && (
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <MVAProgressBar revenueNOK={revenueNOK} mvaRegistered={false} />
         </div>
       )}
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Dashboard Cards - Responsive Grid */}
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Clients Card */}
         <Card>
-          <CardHeader>
-            <CardTitle>Clients</CardTitle>
-            <CardDescription>
-              {clients?.length || 0} Norwegian client
-              {clients?.length !== 1 ? 's' : ''}
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg sm:text-xl">Clients</CardTitle>
+            <CardDescription className="text-sm">
+              {clients?.length || 0} client{clients?.length !== 1 ? 's' : ''}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link href="/dashboard/clients">
-              <Button className="w-full">Manage Clients</Button>
+              <Button className="w-full text-sm sm:text-base">
+                Manage Clients
+              </Button>
             </Link>
           </CardContent>
         </Card>
 
+        {/* Invoices Card */}
         <Card>
-          <CardHeader>
-            <CardTitle>Invoices</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg sm:text-xl">Invoices</CardTitle>
+            <CardDescription className="text-sm">
               {invoices?.length || 0} invoice{invoices?.length !== 1 ? 's' : ''}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link href="/dashboard/invoices">
-              <Button className="w-full">Manage Invoices</Button>
+              <Button className="w-full text-sm sm:text-base">
+                Manage Invoices
+              </Button>
             </Link>
           </CardContent>
         </Card>
 
+        {/* Templates Card */}
         <Card>
-          <CardHeader>
-            <CardTitle>Templates</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg sm:text-xl">Templates</CardTitle>
+            <CardDescription className="text-sm">
               {templates?.length || 0} template
               {templates?.length !== 1 ? 's' : ''}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link href="/dashboard/templates">
-              <Button className="w-full">Manage Templates</Button>
+              <Button className="w-full text-sm sm:text-base">
+                Manage Templates
+              </Button>
             </Link>
           </CardContent>
         </Card>
 
+        {/* Analytics Card */}
         <Card>
-          <CardHeader>
-            <CardTitle>Analytics</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg sm:text-xl">Analytics</CardTitle>
+            <CardDescription className="text-sm">
               Total:{' '}
               {totalRevenue.toLocaleString('nb-NO', {
                 minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
               })}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link href="/dashboard/analytics">
-              <Button className="w-full">View Analytics</Button>
+              <Button className="w-full text-sm sm:text-base">
+                View Analytics
+              </Button>
             </Link>
           </CardContent>
         </Card>

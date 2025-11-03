@@ -10,9 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { DeleteTemplateButton } from '@/components/templates/delete-template-button'
+import { FileText, DollarSign, Calendar, Star } from 'lucide-react'
 
 export default async function TemplatesPage({
   searchParams,
@@ -36,36 +38,112 @@ export default async function TemplatesPage({
     .order('created_at', { ascending: false })
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:py-8 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
             Invoice Templates
           </h1>
-          <p className="mt-2 text-slate-600">
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-600">
             Reusable invoice templates for faster invoicing
           </p>
         </div>
         <Link href="/dashboard/templates/new">
-          <Button>Create Template</Button>
+          <Button className="w-full sm:w-auto">Create Template</Button>
         </Link>
       </div>
 
+      {/* Error Message */}
       {params.error && (
-        <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
           {params.error}
         </div>
       )}
 
-      <div className="mt-8">
-        {!templates || templates.length === 0 ? (
-          <div className="rounded-lg border border-slate-200 bg-white p-12 text-center">
+      {/* Content */}
+      {!templates || templates.length === 0 ? (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <FileText className="mx-auto h-12 w-12 text-slate-400 mb-4" />
             <p className="text-slate-500">
               No templates yet. Create your first template!
             </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {/* Mobile Card View */}
+          <div className="lg:hidden space-y-4">
+            {templates.map((template) => (
+              <Card key={template.id} className="overflow-hidden">
+                <CardContent className="p-4">
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-slate-900 text-base flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-slate-600" />
+                        {template.name}
+                      </h3>
+                      {template.is_default && (
+                        <Badge variant="secondary" className="mt-2 gap-1">
+                          <Star className="h-3 w-3" />
+                          Default
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  {template.description && (
+                    <p className="text-sm text-slate-600 mb-3 line-clamp-2">
+                      {template.description}
+                    </p>
+                  )}
+
+                  {/* Details */}
+                  <div className="space-y-2 mb-3 text-sm">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600 flex items-center gap-1.5">
+                        <DollarSign className="h-3.5 w-3.5" />
+                        Currency
+                      </span>
+                      <span className="font-medium">{template.currency}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600 flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5" />
+                        Default Due Days
+                      </span>
+                      <span className="font-medium">
+                        {template.default_due_days} days
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 pt-3 border-t">
+                    <Link
+                      href={`/dashboard/templates/${template.id}/edit`}
+                      className="flex-1"
+                    >
+                      <Button variant="outline" size="sm" className="w-full">
+                        Edit
+                      </Button>
+                    </Link>
+                    <DeleteTemplateButton
+                      id={template.id}
+                      name={template.name}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        ) : (
-          <div className="rounded-lg border border-slate-200 bg-white">
+
+          {/* Desktop Table View */}
+          <div className="hidden lg:block rounded-lg border border-slate-200 bg-white overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -80,12 +158,15 @@ export default async function TemplatesPage({
                 {templates.map((template) => (
                   <TableRow key={template.id}>
                     <TableCell className="font-medium">
-                      {template.name}
-                      {template.is_default && (
-                        <Badge variant="secondary" className="ml-2">
-                          Default
-                        </Badge>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {template.name}
+                        {template.is_default && (
+                          <Badge variant="secondary" className="gap-1">
+                            <Star className="h-3 w-3" />
+                            Default
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="max-w-xs truncate">
                       {template.description || '-'}
@@ -110,8 +191,8 @@ export default async function TemplatesPage({
               </TableBody>
             </Table>
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   )
 }
