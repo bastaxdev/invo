@@ -1,9 +1,8 @@
-// components/layout/navbar.tsx
+// components/layout/navbar-client.tsx
 'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
 import { signOut } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { Menu, X } from 'lucide-react'
 
 interface NavbarProps {
@@ -33,7 +33,7 @@ interface NavbarProps {
 export function NavbarClient({ user, profile, revenueNOK }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // Determine initials based on business_name or full_name, fallback to email
+  // Determine initials
   let initials = 'U'
   if (profile?.business_name) {
     initials = profile.business_name
@@ -63,12 +63,12 @@ export function NavbarClient({ user, profile, revenueNOK }: NavbarProps) {
   ]
 
   return (
-    <nav className="border-b bg-white sticky top-0 z-50">
+    <nav className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 justify-between items-center">
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center">
-            <span className="text-xl sm:text-2xl font-bold text-slate-900">
+            <span className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
               Invo
             </span>
           </Link>
@@ -77,18 +77,25 @@ export function NavbarClient({ user, profile, revenueNOK }: NavbarProps) {
           <div className="hidden lg:flex items-center space-x-1">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
-                <Button variant="ghost" size="sm">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-slate-700 dark:text-slate-300"
+                >
                   {link.label}
                 </Button>
               </Link>
             ))}
           </div>
 
-          {/* Right Side: MVA Indicator + User Menu + Mobile Toggle */}
+          {/* Right Side */}
           <div className="flex items-center gap-2">
-            {/* MVA Indicator - Hide text on mobile */}
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* MVA Indicator */}
             {!profile?.mva_registered && revenueNOK > 0 && (
-              <div className="hidden sm:block text-xs px-2 py-1 rounded bg-blue-100 text-blue-800">
+              <div className="hidden sm:block text-xs px-2 py-1 rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                 MVA: {Math.round((revenueNOK / 50000) * 100)}%
               </div>
             )}
@@ -108,7 +115,7 @@ export function NavbarClient({ user, profile, revenueNOK }: NavbarProps) {
                         className="object-cover"
                       />
                     )}
-                    <AvatarFallback className="bg-slate-900 text-white text-xs sm:text-sm">
+                    <AvatarFallback className="bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs sm:text-sm">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
@@ -120,7 +127,7 @@ export function NavbarClient({ user, profile, revenueNOK }: NavbarProps) {
                     <p className="text-sm font-medium leading-none">
                       My Account
                     </p>
-                    <p className="text-xs leading-none text-muted-foreground truncate">
+                    <p className="text-xs leading-none text-slate-500 dark:text-slate-400 truncate">
                       {user.email}
                     </p>
                   </div>
@@ -158,21 +165,23 @@ export function NavbarClient({ user, profile, revenueNOK }: NavbarProps) {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t py-4 space-y-2">
+          <div className="lg:hidden border-t border-slate-200 dark:border-slate-800 py-4 space-y-2">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Button variant="ghost" className="w-full justify-start">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-slate-700 dark:text-slate-300"
+                >
                   {link.label}
                 </Button>
               </Link>
             ))}
-            {/* MVA Status in mobile menu */}
             {!profile?.mva_registered && revenueNOK > 0 && (
-              <div className="px-4 py-2 text-sm text-slate-600">
+              <div className="px-4 py-2 text-sm text-slate-600 dark:text-slate-400">
                 MVA Progress: {Math.round((revenueNOK / 50000) * 100)}%
               </div>
             )}

@@ -69,7 +69,7 @@ export function InvoiceLineItems({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Label>Line Items</Label>
+        <Label className="text-foreground">Line Items</Label>
         <Button type="button" variant="outline" size="sm" onClick={addItem}>
           <Plus className="mr-2 h-4 w-4" />
           Add Item
@@ -77,10 +77,10 @@ export function InvoiceLineItems({
       </div>
 
       {items.map((item, index) => (
-        <Card key={index} className="p-4">
+        <Card key={index} className="p-4 border-border">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Description</Label>
+              <Label className="text-foreground">Description</Label>
               <Textarea
                 value={item.description}
                 onChange={(e) =>
@@ -94,7 +94,7 @@ export function InvoiceLineItems({
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label>Quantity</Label>
+                <Label className="text-foreground">Quantity</Label>
                 <Input
                   type="number"
                   step="0.01"
@@ -111,7 +111,7 @@ export function InvoiceLineItems({
                 />
               </div>
               <div className="space-y-2">
-                <Label>Unit Price</Label>
+                <Label className="text-foreground">Unit Price</Label>
                 <Input
                   type="number"
                   step="0.01"
@@ -128,12 +128,12 @@ export function InvoiceLineItems({
                 />
               </div>
               <div className="space-y-2">
-                <Label>Amount</Label>
+                <Label className="text-foreground">Amount</Label>
                 <Input
                   type="number"
                   value={item.amount.toFixed(2)}
                   disabled
-                  className="bg-slate-50"
+                  className="bg-muted"
                 />
               </div>
             </div>
@@ -154,16 +154,16 @@ export function InvoiceLineItems({
       ))}
 
       {/* Totals */}
-      <div className="rounded-lg border bg-slate-50 p-4 space-y-2">
+      <div className="rounded-lg border border-border bg-muted p-4 space-y-2">
         <div className="flex justify-between text-base">
-          <span className="font-medium">Subtotal:</span>
-          <span>
+          <span className="font-medium text-foreground">Subtotal:</span>
+          <span className="text-foreground">
             {subtotal.toFixed(2)} {currency}
           </span>
         </div>
 
         {shouldApplyVAT && (
-          <div className="flex justify-between text-base text-green-700">
+          <div className="flex justify-between text-base text-green-600 dark:text-green-400">
             <span className="font-medium">Norwegian MVA ({VAT_RATE}%):</span>
             <span>
               {vatAmount.toFixed(2)} {currency}
@@ -171,9 +171,9 @@ export function InvoiceLineItems({
           </div>
         )}
 
-        <div className="border-t pt-2 flex justify-between text-lg font-bold">
-          <span>Total Amount:</span>
-          <span>
+        <div className="border-t border-border pt-2 flex justify-between text-lg font-bold">
+          <span className="text-foreground">Total Amount:</span>
+          <span className="text-foreground">
             {totalAmount.toFixed(2)} {currency}
           </span>
         </div>

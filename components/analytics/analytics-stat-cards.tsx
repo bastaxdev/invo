@@ -35,17 +35,17 @@ export function AnalyticsStatCards({
 }: AnalyticsStatCardsProps) {
   return (
     <>
-      {/* Main Stat Cards */}
+      {/* Main Stat Cards - TONED DOWN, NO BRIGHT BACKGROUNDS */}
       <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8">
-        {/* Paid Revenue Card */}
-        <Card className="bg-green-50 border-green-200">
+        {/* Paid Revenue Card - Subtle green accent only */}
+        <Card className="border-border">
           <CardHeader className="pb-3">
-            <CardDescription className="text-green-700 text-xs sm:text-sm">
+            <CardDescription className="text-muted-foreground text-xs sm:text-sm">
               Total Revenue (Paid)
             </CardDescription>
-            <CardTitle className="text-xl sm:text-2xl text-green-900">
+            <CardTitle className="text-xl sm:text-2xl text-foreground">
               {isLoading ? (
-                <span className="text-slate-400">Loading...</span>
+                <span className="text-muted-foreground">Loading...</span>
               ) : (
                 formatCurrency(stats.paidGrossSales, displayCurrency)
               )}
@@ -53,34 +53,34 @@ export function AnalyticsStatCards({
           </CardHeader>
           <CardContent>
             <div className="text-xs sm:text-sm space-y-1">
-              <div className="flex justify-between text-green-700">
-                <span>Net Sales:</span>
-                <span className="font-semibold">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Net Sales:</span>
+                <span className="font-semibold text-foreground">
                   {formatCurrency(stats.paidNetSales, displayCurrency)}
                 </span>
               </div>
-              <div className="flex justify-between text-green-600">
-                <span>VAT Collected:</span>
-                <span className="font-semibold">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">VAT Collected:</span>
+                <span className="font-semibold text-green-600 dark:text-green-400">
                   {formatCurrency(stats.paidVatCollected, displayCurrency)}
                 </span>
               </div>
-              <p className="text-xs text-green-600 mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 {stats.paidCount} paid invoices
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Outstanding Payments Card */}
-        <Card className="bg-blue-50 border-blue-200">
+        {/* Outstanding Payments Card - Subtle blue accent only */}
+        <Card className="border-border">
           <CardHeader className="pb-3">
-            <CardDescription className="text-blue-700 text-xs sm:text-sm">
+            <CardDescription className="text-muted-foreground text-xs sm:text-sm">
               Outstanding Payments
             </CardDescription>
-            <CardTitle className="text-xl sm:text-2xl text-blue-900">
+            <CardTitle className="text-xl sm:text-2xl text-foreground">
               {isLoading ? (
-                <span className="text-slate-400">Loading...</span>
+                <span className="text-muted-foreground">Loading...</span>
               ) : (
                 formatCurrency(stats.outstandingGrossSales, displayCurrency)
               )}
@@ -88,34 +88,34 @@ export function AnalyticsStatCards({
           </CardHeader>
           <CardContent>
             <div className="text-xs sm:text-sm space-y-1">
-              <div className="flex justify-between text-blue-700">
-                <span>Net Amount:</span>
-                <span className="font-semibold">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Net Amount:</span>
+                <span className="font-semibold text-foreground">
                   {formatCurrency(stats.outstandingNetSales, displayCurrency)}
                 </span>
               </div>
-              <div className="flex justify-between text-blue-600">
-                <span>VAT Pending:</span>
-                <span className="font-semibold">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">VAT Pending:</span>
+                <span className="font-semibold text-blue-600 dark:text-blue-400">
                   {formatCurrency(stats.outstandingVat, displayCurrency)}
                 </span>
               </div>
-              <p className="text-xs text-blue-600 mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 {stats.outstandingCount} unpaid invoices
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Total VAT Card */}
-        <Card className="bg-purple-50 border-purple-200">
+        {/* Total VAT Card - Subtle purple accent only */}
+        <Card className="border-border">
           <CardHeader className="pb-3">
-            <CardDescription className="text-purple-700 text-xs sm:text-sm">
+            <CardDescription className="text-muted-foreground text-xs sm:text-sm">
               Total VAT (All Time)
             </CardDescription>
-            <CardTitle className="text-xl sm:text-2xl text-purple-900">
+            <CardTitle className="text-xl sm:text-2xl text-foreground">
               {isLoading ? (
-                <span className="text-slate-400">Loading...</span>
+                <span className="text-muted-foreground">Loading...</span>
               ) : (
                 formatCurrency(stats.totalVat, displayCurrency)
               )}
@@ -123,15 +123,15 @@ export function AnalyticsStatCards({
           </CardHeader>
           <CardContent>
             <div className="text-xs sm:text-sm space-y-1">
-              <div className="flex justify-between text-purple-700">
-                <span>Collected:</span>
-                <span className="font-semibold">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Collected:</span>
+                <span className="font-semibold text-green-600 dark:text-green-400">
                   {formatCurrency(stats.paidVatCollected, displayCurrency)}
                 </span>
               </div>
-              <div className="flex justify-between text-purple-600">
-                <span>Pending:</span>
-                <span className="font-semibold">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Pending:</span>
+                <span className="font-semibold text-blue-600 dark:text-blue-400">
                   {formatCurrency(stats.outstandingVat, displayCurrency)}
                 </span>
               </div>
@@ -139,15 +139,15 @@ export function AnalyticsStatCards({
           </CardContent>
         </Card>
 
-        {/* Average Invoice Card */}
-        <Card className="bg-slate-50 border-slate-200">
+        {/* Average Invoice Card - No color accent */}
+        <Card className="border-border">
           <CardHeader className="pb-3">
-            <CardDescription className="text-slate-700 text-xs sm:text-sm">
+            <CardDescription className="text-muted-foreground text-xs sm:text-sm">
               Average Invoice (Paid)
             </CardDescription>
-            <CardTitle className="text-xl sm:text-2xl text-slate-900">
+            <CardTitle className="text-xl sm:text-2xl text-foreground">
               {isLoading ? (
-                <span className="text-slate-400">Loading...</span>
+                <span className="text-muted-foreground">Loading...</span>
               ) : (
                 formatCurrency(stats.averageInvoiceGross, displayCurrency)
               )}
@@ -155,13 +155,13 @@ export function AnalyticsStatCards({
           </CardHeader>
           <CardContent>
             <div className="text-xs sm:text-sm space-y-1">
-              <div className="flex justify-between text-slate-700">
-                <span>Net Average:</span>
-                <span className="font-semibold">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Net Average:</span>
+                <span className="font-semibold text-foreground">
                   {formatCurrency(stats.averageInvoiceNet, displayCurrency)}
                 </span>
               </div>
-              <p className="text-xs text-slate-600 mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 Based on {stats.paidCount} paid invoices
               </p>
             </div>
@@ -169,10 +169,10 @@ export function AnalyticsStatCards({
         </Card>
       </div>
 
-      {/* Total Sales Summary */}
-      <Card className="mb-6 sm:mb-8 bg-gradient-to-br from-slate-50 to-slate-100 border-slate-300">
+      {/* Total Sales Summary - Clean, no gradient */}
+      <Card className="mb-6 sm:mb-8 border-border">
         <CardHeader className="pb-3">
-          <CardTitle className="text-slate-900 text-base sm:text-lg">
+          <CardTitle className="text-foreground text-base sm:text-lg">
             Total Sales Summary (All Non-Draft Invoices)
           </CardTitle>
           <CardDescription className="text-xs sm:text-sm">
@@ -182,30 +182,30 @@ export function AnalyticsStatCards({
         <CardContent>
           <div className="grid grid-cols-3 gap-3 sm:gap-6">
             <div className="text-center">
-              <div className="text-xs sm:text-sm text-slate-600 mb-1">
+              <div className="text-xs sm:text-sm text-muted-foreground mb-1">
                 Gross Sales
               </div>
-              <div className="text-lg sm:text-2xl font-bold text-slate-900 break-words">
+              <div className="text-lg sm:text-2xl font-bold text-foreground break-words">
                 {isLoading
                   ? '...'
                   : formatCurrency(stats.totalGrossSales, displayCurrency)}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs sm:text-sm text-slate-600 mb-1">
+              <div className="text-xs sm:text-sm text-muted-foreground mb-1">
                 Net Sales
               </div>
-              <div className="text-lg sm:text-2xl font-bold text-slate-900 break-words">
+              <div className="text-lg sm:text-2xl font-bold text-foreground break-words">
                 {isLoading
                   ? '...'
                   : formatCurrency(stats.totalNetSales, displayCurrency)}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xs sm:text-sm text-slate-600 mb-1">
+              <div className="text-xs sm:text-sm text-muted-foreground mb-1">
                 Total VAT
               </div>
-              <div className="text-lg sm:text-2xl font-bold text-slate-900 break-words">
+              <div className="text-lg sm:text-2xl font-bold text-foreground break-words">
                 {isLoading
                   ? '...'
                   : formatCurrency(stats.totalVat, displayCurrency)}

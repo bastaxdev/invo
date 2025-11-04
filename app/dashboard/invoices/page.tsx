@@ -49,13 +49,11 @@ export default async function InvoicesPage({
     )
     .order('created_at', { ascending: false })
 
-  // Check for overdue invoices
   const showOverdueCheck = await shouldShowOverdueCheck()
   const overdueInvoices = showOverdueCheck ? await getOverdueInvoices() : []
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:py-8 sm:px-6 lg:px-8">
-      {/* Overdue Invoice Dialog */}
       {overdueInvoices.length > 0 && (
         <OverdueInvoiceDialog invoices={overdueInvoices} open={true} />
       )}
@@ -63,10 +61,10 @@ export default async function InvoicesPage({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Invoices
           </h1>
-          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-600">
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-muted-foreground">
             Manage your invoices
           </p>
         </div>
@@ -77,13 +75,13 @@ export default async function InvoicesPage({
 
       {/* Alerts */}
       {params.alert && (
-        <div className="mb-4 rounded-md bg-red-50 border-2 border-red-400 p-4 text-sm text-red-800">
+        <div className="mb-4 rounded-md bg-destructive/10 border-2 border-destructive/50 p-4 text-sm text-destructive">
           <strong>⚠️ URGENT:</strong> {params.alert}
         </div>
       )}
 
       {params.error && (
-        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+        <div className="mb-4 rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
           {params.error}
         </div>
       )}
@@ -92,8 +90,8 @@ export default async function InvoicesPage({
       {!invoices || invoices.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
-            <FileText className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-            <p className="text-slate-500">
+            <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground">
               No invoices yet. Create your first invoice!
             </p>
           </CardContent>
@@ -113,10 +111,10 @@ export default async function InvoicesPage({
                     {/* Header Row */}
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <p className="font-semibold text-slate-900 text-base">
+                        <p className="font-semibold text-foreground text-base">
                           {invoice.invoice_number}
                         </p>
-                        <p className="text-sm text-slate-600 mt-0.5">
+                        <p className="text-sm text-muted-foreground mt-0.5">
                           {invoice.clients?.name || 'N/A'}
                         </p>
                       </div>
@@ -126,18 +124,18 @@ export default async function InvoicesPage({
                     {/* Details Grid */}
                     <div className="space-y-2 mb-3 text-sm">
                       <div className="flex justify-between items-center">
-                        <span className="text-slate-600 flex items-center gap-1.5">
+                        <span className="text-muted-foreground flex items-center gap-1.5">
                           <Calendar className="h-3.5 w-3.5" />
                           Issue Date
                         </span>
-                        <span className="font-medium">
+                        <span className="font-medium text-foreground">
                           {new Date(invoice.issue_date).toLocaleDateString()}
                         </span>
                       </div>
 
                       <div className="flex justify-between items-center">
-                        <span className="text-slate-600">Subtotal</span>
-                        <span className="font-medium">
+                        <span className="text-muted-foreground">Subtotal</span>
+                        <span className="font-medium text-foreground">
                           {invoice.amount.toLocaleString('nb-NO', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
@@ -148,10 +146,10 @@ export default async function InvoicesPage({
 
                       {vatRate > 0 && (
                         <div className="flex justify-between items-center">
-                          <span className="text-slate-600">
+                          <span className="text-muted-foreground">
                             VAT ({vatRate}%)
                           </span>
-                          <span className="font-medium text-green-700">
+                          <span className="font-medium text-green-600 dark:text-green-400">
                             {vatAmount.toLocaleString('nb-NO', {
                               minimumFractionDigits: 2,
                               maximumFractionDigits: 2,
@@ -161,12 +159,12 @@ export default async function InvoicesPage({
                         </div>
                       )}
 
-                      <div className="flex justify-between items-center pt-2 border-t">
-                        <span className="text-slate-900 font-semibold flex items-center gap-1.5">
+                      <div className="flex justify-between items-center pt-2 border-t border-border">
+                        <span className="text-foreground font-semibold flex items-center gap-1.5">
                           <DollarSign className="h-4 w-4" />
                           Total
                         </span>
-                        <span className="font-bold text-slate-900">
+                        <span className="font-bold text-foreground">
                           {total.toLocaleString('nb-NO', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
@@ -177,7 +175,7 @@ export default async function InvoicesPage({
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2 pt-3 border-t">
+                    <div className="flex gap-2 pt-3 border-t border-border">
                       <Link
                         href={`/dashboard/invoices/${invoice.id}`}
                         className="flex-1"
@@ -206,7 +204,7 @@ export default async function InvoicesPage({
           </div>
 
           {/* Desktop Table View */}
-          <div className="hidden lg:block rounded-lg border border-slate-200 bg-white overflow-hidden">
+          <div className="hidden lg:block rounded-lg border border-border bg-card overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -228,14 +226,16 @@ export default async function InvoicesPage({
 
                   return (
                     <TableRow key={invoice.id}>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium text-foreground">
                         {invoice.invoice_number}
                       </TableCell>
-                      <TableCell>{invoice.clients?.name || 'N/A'}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-card-foreground">
+                        {invoice.clients?.name || 'N/A'}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
                         {new Date(invoice.issue_date).toLocaleDateString()}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-card-foreground">
                         {invoice.amount.toLocaleString('nb-NO', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
@@ -244,7 +244,7 @@ export default async function InvoicesPage({
                       </TableCell>
                       <TableCell>
                         {vatRate > 0 ? (
-                          <span className="text-green-700 font-medium">
+                          <span className="text-green-600 dark:text-green-400 font-medium">
                             {vatRate}% (
                             {vatAmount.toLocaleString('nb-NO', {
                               minimumFractionDigits: 2,
@@ -253,10 +253,10 @@ export default async function InvoicesPage({
                             )
                           </span>
                         ) : (
-                          <span className="text-slate-500">0%</span>
+                          <span className="text-muted-foreground">0%</span>
                         )}
                       </TableCell>
-                      <TableCell className="font-semibold">
+                      <TableCell className="font-semibold text-foreground">
                         {total.toLocaleString('nb-NO', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,

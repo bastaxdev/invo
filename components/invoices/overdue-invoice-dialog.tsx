@@ -1,3 +1,4 @@
+// components/invoices/overdue-invoice-dialog.tsx
 'use client'
 
 import { useState } from 'react'
@@ -106,7 +107,7 @@ export function OverdueInvoiceDialog({
         </button>
 
         <DialogHeader>
-          <DialogTitle className="text-xl">
+          <DialogTitle className="text-xl text-foreground">
             ⚠️ Overdue Invoice{invoices.length > 1 ? 's' : ''} Alert
           </DialogTitle>
           <DialogDescription>
@@ -121,7 +122,7 @@ export function OverdueInvoiceDialog({
             return (
               <div
                 key={invoice.id}
-                className="flex items-start space-x-3 rounded-lg border border-red-200 bg-red-50 p-4"
+                className="flex items-start space-x-3 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-4"
               >
                 <Checkbox
                   checked={selectedInvoices.has(invoice.id)}
@@ -131,24 +132,24 @@ export function OverdueInvoiceDialog({
                 <div className="flex-1">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-semibold text-slate-900">
+                      <p className="font-semibold text-foreground">
                         {invoice.invoice_number}
                       </p>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-muted-foreground">
                         {Array.isArray(invoice.clients)
                           ? invoice.clients[0]?.name || 'No client'
                           : invoice.clients?.name || 'No client'}
                       </p>
                     </div>
-                    <p className="text-lg font-bold text-slate-900">
+                    <p className="text-lg font-bold text-foreground">
                       {formatCurrency(invoice.amount, invoice.currency)}
                     </p>
                   </div>
                   <div className="mt-2 flex items-center gap-4 text-xs">
-                    <span className="text-slate-500">
+                    <span className="text-muted-foreground">
                       Due: {new Date(invoice.due_date).toLocaleDateString()}
                     </span>
-                    <span className="font-semibold text-red-600">
+                    <span className="font-semibold text-red-600 dark:text-red-400">
                       {daysOverdue} day{daysOverdue > 1 ? 's' : ''} overdue
                     </span>
                   </div>

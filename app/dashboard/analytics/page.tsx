@@ -103,8 +103,8 @@ export default async function AnalyticsPage({
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Analytics</h1>
-        <p className="mt-2 text-slate-600">
+        <h1 className="text-3xl font-bold text-foreground">Analytics</h1>
+        <p className="mt-2 text-muted-foreground">
           Comprehensive overview of your financial performance
         </p>
       </div>
@@ -116,38 +116,53 @@ export default async function AnalyticsPage({
         displayCurrency={displayCurrency}
       />
 
-      {/* Status Breakdown */}
+      {/* Status Breakdown - TONED DOWN COLORS */}
       <div className="mb-8">
         <Card>
           <CardHeader>
-            <CardTitle>Invoice Status Breakdown</CardTitle>
+            <CardTitle className="text-foreground">
+              Invoice Status Breakdown
+            </CardTitle>
             <CardDescription>Current status of all invoices</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div className="rounded-lg border bg-slate-50 p-4">
-                <div className="text-2xl font-bold text-slate-700">
+              {/* Draft - Neutral */}
+              <div className="rounded-lg border border-border bg-card p-4">
+                <div className="text-2xl font-bold text-foreground">
                   {statusCounts.draft}
                 </div>
-                <div className="text-sm text-slate-600">Draft</div>
+                <div className="text-sm text-muted-foreground">Draft</div>
               </div>
-              <div className="rounded-lg border bg-blue-50 p-4">
-                <div className="text-2xl font-bold text-blue-700">
+
+              {/* Sent - Subtle Blue */}
+              <div className="rounded-lg border border-border bg-card p-4">
+                <div className="text-2xl font-bold text-foreground">
                   {statusCounts.sent}
                 </div>
-                <div className="text-sm text-blue-600">Sent</div>
+                <div className="text-sm text-blue-600 dark:text-blue-400">
+                  Sent
+                </div>
               </div>
-              <div className="rounded-lg border bg-green-50 p-4">
-                <div className="text-2xl font-bold text-green-700">
+
+              {/* Paid - Subtle Green */}
+              <div className="rounded-lg border border-border bg-card p-4">
+                <div className="text-2xl font-bold text-foreground">
                   {statusCounts.paid}
                 </div>
-                <div className="text-sm text-green-600">Paid</div>
+                <div className="text-sm text-green-600 dark:text-green-400">
+                  Paid
+                </div>
               </div>
-              <div className="rounded-lg border bg-red-50 p-4">
-                <div className="text-2xl font-bold text-red-700">
+
+              {/* Overdue - Subtle Red */}
+              <div className="rounded-lg border border-border bg-card p-4">
+                <div className="text-2xl font-bold text-foreground">
                   {statusCounts.overdue}
                 </div>
-                <div className="text-sm text-red-600">Overdue</div>
+                <div className="text-sm text-red-600 dark:text-red-400">
+                  Overdue
+                </div>
               </div>
             </div>
           </CardContent>
@@ -157,81 +172,106 @@ export default async function AnalyticsPage({
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Invoices</CardTitle>
+          <CardTitle className="text-foreground">Recent Invoices</CardTitle>
           <CardDescription>
             Latest 10 invoices with current status
           </CardDescription>
         </CardHeader>
         <CardContent>
           {typedInvoices.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Invoice #</TableHead>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Issue Date</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead className="text-right">Net Amount</TableHead>
-                  <TableHead className="text-right">VAT</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {typedInvoices.slice(0, 10).map((invoice) => {
-                  const dueDate = new Date(invoice.due_date)
-                  dueDate.setHours(0, 0, 0, 0)
-                  const isOverdue = dueDate < today && invoice.status !== 'paid'
-                  const displayStatus = isOverdue ? 'overdue' : invoice.status
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-border hover:bg-transparent">
+                    <TableHead className="text-foreground font-semibold">
+                      Invoice #
+                    </TableHead>
+                    <TableHead className="text-foreground font-semibold">
+                      Client
+                    </TableHead>
+                    <TableHead className="text-foreground font-semibold">
+                      Issue Date
+                    </TableHead>
+                    <TableHead className="text-foreground font-semibold">
+                      Due Date
+                    </TableHead>
+                    <TableHead className="text-right text-foreground font-semibold">
+                      Net Amount
+                    </TableHead>
+                    <TableHead className="text-right text-foreground font-semibold">
+                      VAT
+                    </TableHead>
+                    <TableHead className="text-right text-foreground font-semibold">
+                      Total
+                    </TableHead>
+                    <TableHead className="text-foreground font-semibold">
+                      Status
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {typedInvoices.slice(0, 10).map((invoice) => {
+                    const dueDate = new Date(invoice.due_date)
+                    dueDate.setHours(0, 0, 0, 0)
+                    const isOverdue =
+                      dueDate < today && invoice.status !== 'paid'
+                    const displayStatus = isOverdue ? 'overdue' : invoice.status
 
-                  return (
-                    <TableRow key={invoice.id}>
-                      <TableCell className="font-medium">
-                        <Link
-                          href={`/dashboard/invoices/${invoice.id}`}
-                          className="text-blue-600 hover:underline"
-                        >
-                          {invoice.invoice_number}
-                        </Link>
-                      </TableCell>
-                      <TableCell>{invoice.clients?.name || 'N/A'}</TableCell>
-                      <TableCell>
-                        {new Date(invoice.issue_date).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={
-                            isOverdue ? 'text-red-600 font-semibold' : ''
-                          }
-                        >
-                          {new Date(invoice.due_date).toLocaleDateString()}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {formatCurrency(invoice.amount, invoice.currency)}
-                      </TableCell>
-                      <TableCell className="text-right text-slate-600">
-                        {formatCurrency(
-                          invoice.vat_amount || 0,
-                          invoice.currency
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right font-semibold">
-                        {formatCurrency(
-                          invoice.amount_with_vat || invoice.amount,
-                          invoice.currency
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={displayStatus} />
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
+                    return (
+                      <TableRow key={invoice.id} className="border-border">
+                        <TableCell className="font-medium text-foreground">
+                          <Link
+                            href={`/dashboard/invoices/${invoice.id}`}
+                            className="text-primary hover:underline"
+                          >
+                            {invoice.invoice_number}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="text-foreground">
+                          {invoice.clients?.name || 'N/A'}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {new Date(invoice.issue_date).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <span
+                            className={
+                              isOverdue
+                                ? 'text-red-600 dark:text-red-400 font-semibold'
+                                : 'text-muted-foreground'
+                            }
+                          >
+                            {new Date(invoice.due_date).toLocaleDateString()}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right text-foreground">
+                          {formatCurrency(invoice.amount, invoice.currency)}
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground">
+                          {formatCurrency(
+                            invoice.vat_amount || 0,
+                            invoice.currency
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right font-semibold text-foreground">
+                          {formatCurrency(
+                            invoice.amount_with_vat || invoice.amount,
+                            invoice.currency
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={displayStatus} />
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
-            <p className="text-center text-slate-500 py-8">No invoices yet</p>
+            <p className="text-center text-muted-foreground py-8">
+              No invoices yet
+            </p>
           )}
         </CardContent>
       </Card>

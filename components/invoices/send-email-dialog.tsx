@@ -73,14 +73,18 @@ export function SendEmailDialog({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Send Invoice via Email</DialogTitle>
+          <DialogTitle className="text-foreground">
+            Send Invoice via Email
+          </DialogTitle>
           <DialogDescription>
             Send invoice {invoiceNumber} as a PDF attachment
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSend} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Recipient Email</Label>
+            <Label htmlFor="email" className="text-foreground">
+              Recipient Email
+            </Label>
             <Input
               id="email"
               type="email"
@@ -92,7 +96,9 @@ export function SendEmailDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="language">Email Language</Label>
+            <Label htmlFor="language" className="text-foreground">
+              Email Language
+            </Label>
             <Select
               value={language}
               onValueChange={(value: 'en' | 'pl' | 'no') => setLanguage(value)}
@@ -106,7 +112,7 @@ export function SendEmailDialog({
                 <SelectItem value="no">🇳🇴 Norwegian</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Choose the language for the email body (PDF is always bilingual)
             </p>
           </div>
@@ -115,8 +121,8 @@ export function SendEmailDialog({
             <div
               className={`rounded-md p-3 text-sm ${
                 message.type === 'success'
-                  ? 'bg-green-50 text-green-800'
-                  : 'bg-red-50 text-red-800'
+                  ? 'bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800'
+                  : 'bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800'
               }`}
             >
               {message.text}

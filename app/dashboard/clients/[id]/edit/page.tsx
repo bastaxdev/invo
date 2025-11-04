@@ -52,23 +52,23 @@ export default async function EditClientPage({
   const updateClientWithId = updateClient.bind(null, id)
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
         <Card>
           <CardHeader>
-            <CardTitle>Edit Client</CardTitle>
+            <CardTitle className="text-foreground">Edit Client</CardTitle>
             <CardDescription>Update client information</CardDescription>
           </CardHeader>
           <CardContent>
             <form action={updateClientWithId} className="space-y-6">
               {/* Basic Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-slate-900">
+                <h3 className="text-lg font-semibold text-foreground">
                   Basic Information
                 </h3>
 
                 <div className="space-y-2">
-                  <Label htmlFor="name">
+                  <Label htmlFor="name" className="text-foreground">
                     Client Name <span className="text-red-500">*</span>
                   </Label>
                   <Input
@@ -79,14 +79,16 @@ export default async function EditClientPage({
                     defaultValue={client.name}
                     required
                   />
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Company or individual name
                   </p>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="country">Country</Label>
+                    <Label htmlFor="country" className="text-foreground">
+                      Country
+                    </Label>
                     <Select
                       name="country"
                       defaultValue={client.country || 'NO'}
@@ -108,7 +110,7 @@ export default async function EditClientPage({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="org_number">
+                    <Label htmlFor="org_number" className="text-foreground">
                       Organization Number (Optional)
                     </Label>
                     <Input
@@ -118,14 +120,16 @@ export default async function EditClientPage({
                       placeholder="e.g., 123456789"
                       defaultValue={client.org_number || ''}
                     />
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-muted-foreground">
                       Leave empty for individual clients
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="tax_id">Tax ID / VAT Number (Optional)</Label>
+                  <Label htmlFor="tax_id" className="text-foreground">
+                    Tax ID / VAT Number (Optional)
+                  </Label>
                   <Input
                     id="tax_id"
                     name="tax_id"
@@ -133,21 +137,23 @@ export default async function EditClientPage({
                     placeholder="e.g., NO123456789MVA"
                     defaultValue={client.tax_id || ''}
                   />
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     VAT/MVA registration number if applicable
                   </p>
                 </div>
               </div>
 
               {/* Contact Information */}
-              <div className="space-y-4 border-t pt-4">
-                <h3 className="text-lg font-semibold text-slate-900">
+              <div className="space-y-4 border-t border-border pt-4">
+                <h3 className="text-lg font-semibold text-foreground">
                   Contact Information
                 </h3>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address (Optional)</Label>
+                    <Label htmlFor="email" className="text-foreground">
+                      Email Address (Optional)
+                    </Label>
                     <Input
                       id="email"
                       name="email"
@@ -158,7 +164,9 @@ export default async function EditClientPage({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number (Optional)</Label>
+                    <Label htmlFor="phone" className="text-foreground">
+                      Phone Number (Optional)
+                    </Label>
                     <Input
                       id="phone"
                       name="phone"
@@ -170,7 +178,7 @@ export default async function EditClientPage({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="address">
+                  <Label htmlFor="address" className="text-foreground">
                     Address <span className="text-red-500">*</span>
                   </Label>
                   <Textarea
@@ -181,13 +189,13 @@ export default async function EditClientPage({
                     defaultValue={client.address}
                     required
                   />
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Full address including street, postal code, and city
                   </p>
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-4 border-t">
+              <div className="flex gap-4 pt-4 border-t border-border">
                 <Button type="submit" className="flex-1">
                   Update Client
                 </Button>

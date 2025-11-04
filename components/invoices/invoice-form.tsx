@@ -47,7 +47,7 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
   return (
     <form action={action} className="space-y-6">
       {/* Client Selection */}
-      <div className="space-y-4 rounded-lg border p-4">
+      <div className="space-y-4 rounded-lg border border-border p-4">
         <div className="flex items-center space-x-2">
           <Checkbox
             id="use-new-client"
@@ -56,7 +56,7 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
           />
           <label
             htmlFor="use-new-client"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground"
           >
             Create new client for this invoice
           </label>
@@ -64,7 +64,9 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
 
         {!useNewClient ? (
           <div className="space-y-2">
-            <Label htmlFor="client_id">Select Existing Client</Label>
+            <Label htmlFor="client_id" className="text-foreground">
+              Select Existing Client
+            </Label>
             <Select
               name="client_id"
               defaultValue={invoice?.client_id}
@@ -84,11 +86,13 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-muted-foreground">
               New client will be created and saved to your clients list
             </p>
             <div className="space-y-2">
-              <Label htmlFor="new_client_name">Client Name</Label>
+              <Label htmlFor="new_client_name" className="text-foreground">
+                Client Name
+              </Label>
               <Input
                 id="new_client_name"
                 name="new_client_name"
@@ -98,7 +102,12 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="new_client_org_number">Organization Number</Label>
+              <Label
+                htmlFor="new_client_org_number"
+                className="text-foreground"
+              >
+                Organization Number
+              </Label>
               <Input
                 id="new_client_org_number"
                 name="new_client_org_number"
@@ -108,7 +117,9 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="new_client_address">Address</Label>
+              <Label htmlFor="new_client_address" className="text-foreground">
+                Address
+              </Label>
               <Input
                 id="new_client_address"
                 name="new_client_address"
@@ -124,7 +135,9 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
       {/* Invoice Details */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="invoice_number">Invoice Number</Label>
+          <Label htmlFor="invoice_number" className="text-foreground">
+            Invoice Number
+          </Label>
           <Input
             id="invoice_number"
             name="invoice_number"
@@ -137,7 +150,9 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="issue_date">Issue Date</Label>
+            <Label htmlFor="issue_date" className="text-foreground">
+              Issue Date
+            </Label>
             <Input
               id="issue_date"
               name="issue_date"
@@ -147,7 +162,9 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="due_date">Due Date</Label>
+            <Label htmlFor="due_date" className="text-foreground">
+              Due Date
+            </Label>
             <Input
               id="due_date"
               name="due_date"
@@ -159,7 +176,9 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description" className="text-foreground">
+            Description
+          </Label>
           <Textarea
             id="description"
             name="description"
@@ -172,7 +191,9 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
+            <Label htmlFor="amount" className="text-foreground">
+              Amount
+            </Label>
             <Input
               id="amount"
               name="amount"
@@ -185,7 +206,9 @@ export function InvoiceForm({ clients, invoice, action }: InvoiceFormProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="currency">Currency</Label>
+            <Label htmlFor="currency" className="text-foreground">
+              Currency
+            </Label>
             <Select
               name="currency"
               defaultValue={invoice?.currency || 'NOK'}

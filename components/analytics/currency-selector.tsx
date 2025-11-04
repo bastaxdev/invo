@@ -22,7 +22,7 @@ export function CurrencySelector({
 }: CurrencySelectorProps) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm text-slate-600">View in:</span>
+      <span className="text-sm text-foreground font-medium">View in:</span>
       <Select value={currentCurrency} onValueChange={onCurrencyChange}>
         <SelectTrigger className="w-[180px]">
           <SelectValue />

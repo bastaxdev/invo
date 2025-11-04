@@ -42,10 +42,10 @@ export default async function TemplatesPage({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Invoice Templates
           </h1>
-          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-600">
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-muted-foreground">
             Reusable invoice templates for faster invoicing
           </p>
         </div>
@@ -56,7 +56,7 @@ export default async function TemplatesPage({
 
       {/* Error Message */}
       {params.error && (
-        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+        <div className="mb-4 rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
           {params.error}
         </div>
       )}
@@ -65,8 +65,8 @@ export default async function TemplatesPage({
       {!templates || templates.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
-            <FileText className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-            <p className="text-slate-500">
+            <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground">
               No templates yet. Create your first template!
             </p>
           </CardContent>
@@ -81,8 +81,8 @@ export default async function TemplatesPage({
                   {/* Header */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-slate-900 text-base flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-slate-600" />
+                      <h3 className="font-semibold text-foreground text-base flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-muted-foreground" />
                         {template.name}
                       </h3>
                       {template.is_default && (
@@ -96,7 +96,7 @@ export default async function TemplatesPage({
 
                   {/* Description */}
                   {template.description && (
-                    <p className="text-sm text-slate-600 mb-3 line-clamp-2">
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                       {template.description}
                     </p>
                   )}
@@ -104,26 +104,28 @@ export default async function TemplatesPage({
                   {/* Details */}
                   <div className="space-y-2 mb-3 text-sm">
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-600 flex items-center gap-1.5">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
                         <DollarSign className="h-3.5 w-3.5" />
                         Currency
                       </span>
-                      <span className="font-medium">{template.currency}</span>
+                      <span className="font-medium text-foreground">
+                        {template.currency}
+                      </span>
                     </div>
 
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-600 flex items-center gap-1.5">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
                         <Calendar className="h-3.5 w-3.5" />
                         Default Due Days
                       </span>
-                      <span className="font-medium">
+                      <span className="font-medium text-foreground">
                         {template.default_due_days} days
                       </span>
                     </div>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2 pt-3 border-t">
+                  <div className="flex gap-2 pt-3 border-t border-border">
                     <Link
                       href={`/dashboard/templates/${template.id}/edit`}
                       className="flex-1"
@@ -143,7 +145,7 @@ export default async function TemplatesPage({
           </div>
 
           {/* Desktop Table View */}
-          <div className="hidden lg:block rounded-lg border border-slate-200 bg-white overflow-hidden">
+          <div className="hidden lg:block rounded-lg border border-border bg-card overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -157,7 +159,7 @@ export default async function TemplatesPage({
               <TableBody>
                 {templates.map((template) => (
                   <TableRow key={template.id}>
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium text-foreground">
                       <div className="flex items-center gap-2">
                         {template.name}
                         {template.is_default && (
@@ -168,11 +170,15 @@ export default async function TemplatesPage({
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-xs truncate">
+                    <TableCell className="max-w-xs truncate text-muted-foreground">
                       {template.description || '-'}
                     </TableCell>
-                    <TableCell>{template.currency}</TableCell>
-                    <TableCell>{template.default_due_days} days</TableCell>
+                    <TableCell className="text-card-foreground">
+                      {template.currency}
+                    </TableCell>
+                    <TableCell className="text-card-foreground">
+                      {template.default_due_days} days
+                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Link href={`/dashboard/templates/${template.id}/edit`}>

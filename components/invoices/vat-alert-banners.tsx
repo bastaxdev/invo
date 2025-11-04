@@ -18,14 +18,14 @@ export function VATAlertBanners({
     <>
       {/* Threshold Crossed Alert */}
       {showThresholdAlert && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+        <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-4">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-red-900">
+              <h3 className="font-semibold text-red-900 dark:text-red-200">
                 ⚠️ CRITICAL: MVA Registration Required
               </h3>
-              <p className="text-sm text-red-800 mt-1">
+              <p className="text-sm text-red-800 dark:text-red-300 mt-1">
                 You have crossed the NOK 50,000 MVA threshold. You are{' '}
                 <strong>legally required</strong> to register for MVA
                 immediately. This invoice will include 25% VAT and will show:
@@ -38,14 +38,14 @@ export function VATAlertBanners({
 
       {/* VAT Info Banner - Registered */}
       {mvaRegistered && shouldApplyVAT && (
-        <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+        <div className="rounded-lg border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950 p-4">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-green-600 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-green-900">
+              <h3 className="font-semibold text-green-900 dark:text-green-200">
                 25% Norwegian MVA will be applied
               </h3>
-              <p className="text-sm text-green-800 mt-1">
+              <p className="text-sm text-green-800 dark:text-green-300 mt-1">
                 You are registered for MVA. Norwegian VAT will automatically be
                 added to this invoice for Norwegian clients.
               </p>
@@ -56,12 +56,14 @@ export function VATAlertBanners({
 
       {/* Export Banner */}
       {mvaRegistered && !shouldApplyVAT && clientCountry !== 'NO' && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 p-4">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-blue-900">Export - 0% VAT</h3>
-              <p className="text-sm text-blue-800 mt-1">
+              <h3 className="font-semibold text-blue-900 dark:text-blue-200">
+                Export - 0% VAT
+              </h3>
+              <p className="text-sm text-blue-800 dark:text-blue-300 mt-1">
                 This is an export sale (non-Norwegian client). VAT rate: 0%
                 (zero-rated export).
               </p>

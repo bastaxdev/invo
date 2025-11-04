@@ -68,14 +68,18 @@ export function UpdateStatusDialog({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update Invoice Status</DialogTitle>
+          <DialogTitle className="text-foreground">
+            Update Invoice Status
+          </DialogTitle>
           <DialogDescription>
             Change the status of this invoice
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="status" className="text-foreground">
+              Status
+            </Label>
             <Select value={status} onValueChange={setStatus}>
               <SelectTrigger>
                 <SelectValue />
@@ -93,8 +97,8 @@ export function UpdateStatusDialog({
             <div
               className={`rounded-md p-3 text-sm ${
                 message.type === 'success'
-                  ? 'bg-green-50 text-green-800'
-                  : 'bg-red-50 text-red-800'
+                  ? 'bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800'
+                  : 'bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800'
               }`}
             >
               {message.text}

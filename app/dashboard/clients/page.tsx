@@ -41,10 +41,10 @@ export default async function ClientsPage({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             Clients
           </h1>
-          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-600">
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-muted-foreground">
             Manage your clients
           </p>
         </div>
@@ -55,7 +55,7 @@ export default async function ClientsPage({
 
       {/* Error Message */}
       {params.error && (
-        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+        <div className="mb-4 rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
           {params.error}
         </div>
       )}
@@ -64,8 +64,8 @@ export default async function ClientsPage({
       {!clients || clients.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
-            <Users className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-            <p className="text-slate-500">
+            <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground">
               No clients yet. Add your first client!
             </p>
           </CardContent>
@@ -80,12 +80,12 @@ export default async function ClientsPage({
                   {/* Header */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-slate-900 text-base flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-slate-600" />
+                      <h3 className="font-semibold text-foreground text-base flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
                         {client.name}
                       </h3>
                       {client.country && (
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           {client.country === 'NO' && '🇳🇴 Norway'}
                           {client.country === 'PL' && '🇵🇱 Poland'}
                           {client.country === 'SE' && '🇸🇪 Sweden'}
@@ -105,10 +105,12 @@ export default async function ClientsPage({
                   <div className="space-y-2 mb-3 text-sm">
                     {client.org_number && (
                       <div className="flex items-start gap-2">
-                        <Hash className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                        <Hash className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-xs text-slate-500">Org. Number</p>
-                          <p className="font-medium text-slate-700">
+                          <p className="text-xs text-muted-foreground">
+                            Org. Number
+                          </p>
+                          <p className="font-medium text-foreground">
                             {client.org_number}
                           </p>
                         </div>
@@ -117,10 +119,12 @@ export default async function ClientsPage({
 
                     {client.address && (
                       <div className="flex items-start gap-2">
-                        <MapPin className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                        <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-xs text-slate-500">Address</p>
-                          <p className="font-medium text-slate-700 whitespace-pre-line">
+                          <p className="text-xs text-muted-foreground">
+                            Address
+                          </p>
+                          <p className="font-medium text-foreground whitespace-pre-line">
                             {client.address}
                           </p>
                         </div>
@@ -129,12 +133,12 @@ export default async function ClientsPage({
 
                     {client.email && (
                       <div className="flex items-start gap-2">
-                        <Mail className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                        <Mail className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-xs text-slate-500">Email</p>
+                          <p className="text-xs text-muted-foreground">Email</p>
                           <a
                             href={`mailto:${client.email}`}
-                            className="font-medium text-blue-600 hover:underline"
+                            className="font-medium text-primary hover:underline"
                           >
                             {client.email}
                           </a>
@@ -144,12 +148,12 @@ export default async function ClientsPage({
 
                     {client.phone && (
                       <div className="flex items-start gap-2">
-                        <Phone className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                        <Phone className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-xs text-slate-500">Phone</p>
+                          <p className="text-xs text-muted-foreground">Phone</p>
                           <a
                             href={`tel:${client.phone}`}
-                            className="font-medium text-blue-600 hover:underline"
+                            className="font-medium text-primary hover:underline"
                           >
                             {client.phone}
                           </a>
@@ -159,7 +163,7 @@ export default async function ClientsPage({
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2 pt-3 border-t">
+                  <div className="flex gap-2 pt-3 border-t border-border">
                     <Link
                       href={`/dashboard/clients/${client.id}/edit`}
                       className="flex-1"
@@ -176,7 +180,7 @@ export default async function ClientsPage({
           </div>
 
           {/* Desktop Table View */}
-          <div className="hidden lg:block rounded-lg border border-slate-200 bg-white overflow-hidden">
+          <div className="hidden lg:block rounded-lg border border-border bg-card overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -191,9 +195,13 @@ export default async function ClientsPage({
               <TableBody>
                 {clients.map((client) => (
                   <TableRow key={client.id}>
-                    <TableCell className="font-medium">{client.name}</TableCell>
-                    <TableCell>{client.org_number || '-'}</TableCell>
-                    <TableCell>
+                    <TableCell className="font-medium text-foreground">
+                      {client.name}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {client.org_number || '-'}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
                       {client.country === 'NO' && '🇳🇴 Norway'}
                       {client.country === 'PL' && '🇵🇱 Poland'}
                       {client.country === 'SE' && '🇸🇪 Sweden'}
@@ -210,10 +218,10 @@ export default async function ClientsPage({
                       <div className="text-sm space-y-1">
                         {client.email && (
                           <div className="flex items-center gap-1.5">
-                            <Mail className="h-3.5 w-3.5 text-slate-400" />
+                            <Mail className="h-3.5 w-3.5 text-muted-foreground" />
                             <a
                               href={`mailto:${client.email}`}
-                              className="text-blue-600 hover:underline"
+                              className="text-primary hover:underline"
                             >
                               {client.email}
                             </a>
@@ -221,19 +229,21 @@ export default async function ClientsPage({
                         )}
                         {client.phone && (
                           <div className="flex items-center gap-1.5">
-                            <Phone className="h-3.5 w-3.5 text-slate-400" />
+                            <Phone className="h-3.5 w-3.5 text-muted-foreground" />
                             <a
                               href={`tel:${client.phone}`}
-                              className="text-blue-600 hover:underline"
+                              className="text-primary hover:underline"
                             >
                               {client.phone}
                             </a>
                           </div>
                         )}
-                        {!client.email && !client.phone && '-'}
+                        {!client.email && !client.phone && (
+                          <span className="text-muted-foreground">-</span>
+                        )}
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-xs truncate">
+                    <TableCell className="max-w-xs truncate text-muted-foreground">
                       {client.address}
                     </TableCell>
                     <TableCell className="text-right">

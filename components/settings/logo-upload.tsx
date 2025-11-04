@@ -123,11 +123,11 @@ export function LogoUpload({ currentLogoUrl, userId }: LogoUploadProps) {
 
   return (
     <div className="space-y-4">
-      <Label>Company Logo</Label>
+      <Label className="text-foreground">Company Logo</Label>
 
       {logoUrl ? (
         <div className="space-y-4">
-          <div className="relative h-32 w-32 rounded-lg border bg-slate-50 p-2">
+          <div className="relative h-32 w-32 rounded-lg border border-border bg-muted p-2">
             <Image
               src={logoUrl}
               alt="Company logo"
@@ -152,10 +152,12 @@ export function LogoUpload({ currentLogoUrl, userId }: LogoUploadProps) {
         <div className="space-y-2">
           <label
             htmlFor="logo-upload"
-            className="flex h-32 w-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100"
+            className="flex h-32 w-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted hover:bg-accent transition-colors"
           >
-            <Upload className="h-8 w-8 text-slate-400" />
-            <span className="mt-2 text-xs text-slate-500">Upload Logo</span>
+            <Upload className="h-8 w-8 text-muted-foreground" />
+            <span className="mt-2 text-xs text-muted-foreground">
+              Upload Logo
+            </span>
             <input
               id="logo-upload"
               type="file"
@@ -165,15 +167,19 @@ export function LogoUpload({ currentLogoUrl, userId }: LogoUploadProps) {
               className="hidden"
             />
           </label>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             PNG, JPG or SVG only. Max 2MB.
           </p>
         </div>
       )}
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+      )}
 
-      {uploading && <p className="text-sm text-slate-600">Uploading...</p>}
+      {uploading && (
+        <p className="text-sm text-muted-foreground">Uploading...</p>
+      )}
     </div>
   )
 }

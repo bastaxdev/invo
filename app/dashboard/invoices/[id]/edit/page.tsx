@@ -1,3 +1,4 @@
+// app/dashboard/invoices/[id]/edit/page.tsx
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { updateInvoice } from '@/app/actions/invoices'
@@ -62,14 +63,14 @@ export default async function EditInvoicePage({
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Edit Invoice</h1>
-        <p className="mt-2 text-slate-600">
+        <h1 className="text-3xl font-bold text-foreground">Edit Invoice</h1>
+        <p className="mt-2 text-muted-foreground">
           Update invoice {invoice.invoice_number}
         </p>
       </div>
 
       {queryParams.error && (
-        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+        <div className="mb-4 rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
           {queryParams.error}
         </div>
       )}

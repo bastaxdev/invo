@@ -52,7 +52,7 @@ export function AnalyticsTables({
       {/* Monthly Breakdown */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base sm:text-lg">
+          <CardTitle className="text-base sm:text-lg text-foreground">
             Monthly Breakdown
           </CardTitle>
           <CardDescription className="text-xs sm:text-sm">
@@ -65,17 +65,19 @@ export function AnalyticsTables({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-xs sm:text-sm">Month</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm">
+                    <TableHead className="text-xs sm:text-sm text-foreground font-semibold">
+                      Month
+                    </TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm text-foreground font-semibold">
                       Count
                     </TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm">
+                    <TableHead className="text-right text-xs sm:text-sm text-foreground font-semibold">
                       Net
                     </TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm">
+                    <TableHead className="text-right text-xs sm:text-sm text-foreground font-semibold">
                       VAT
                     </TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm">
+                    <TableHead className="text-right text-xs sm:text-sm text-foreground font-semibold">
                       Gross
                     </TableHead>
                   </TableRow>
@@ -85,23 +87,23 @@ export function AnalyticsTables({
                     .slice(0, 6)
                     .map(([month, data]) => (
                       <TableRow key={month}>
-                        <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap">
+                        <TableCell className="font-medium text-xs sm:text-sm whitespace-nowrap text-foreground">
                           {month}
                         </TableCell>
-                        <TableCell className="text-right text-xs sm:text-sm">
+                        <TableCell className="text-right text-xs sm:text-sm text-muted-foreground">
                           {data.count}
                         </TableCell>
-                        <TableCell className="text-right text-xs sm:text-sm whitespace-nowrap">
+                        <TableCell className="text-right text-xs sm:text-sm whitespace-nowrap text-foreground">
                           {isLoading
                             ? '...'
                             : formatCurrency(data.netAmount, displayCurrency)}
                         </TableCell>
-                        <TableCell className="text-right text-slate-600 text-xs sm:text-sm whitespace-nowrap">
+                        <TableCell className="text-right text-muted-foreground text-xs sm:text-sm whitespace-nowrap">
                           {isLoading
                             ? '...'
                             : formatCurrency(data.vatAmount, displayCurrency)}
                         </TableCell>
-                        <TableCell className="text-right font-semibold text-xs sm:text-sm whitespace-nowrap">
+                        <TableCell className="text-right font-semibold text-xs sm:text-sm whitespace-nowrap text-foreground">
                           {isLoading
                             ? '...'
                             : formatCurrency(data.grossAmount, displayCurrency)}
@@ -112,7 +114,7 @@ export function AnalyticsTables({
               </Table>
             </div>
           ) : (
-            <p className="text-center text-slate-500 py-8 text-sm">
+            <p className="text-center text-muted-foreground py-8 text-sm">
               No paid invoices yet
             </p>
           )}
@@ -122,7 +124,9 @@ export function AnalyticsTables({
       {/* Top Clients */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base sm:text-lg">Top Clients</CardTitle>
+          <CardTitle className="text-base sm:text-lg text-foreground">
+            Top Clients
+          </CardTitle>
           <CardDescription className="text-xs sm:text-sm">
             By paid revenue in {displayCurrency}
           </CardDescription>
@@ -133,14 +137,16 @@ export function AnalyticsTables({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-xs sm:text-sm">Client</TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm">
+                    <TableHead className="text-xs sm:text-sm text-foreground font-semibold">
+                      Client
+                    </TableHead>
+                    <TableHead className="text-right text-xs sm:text-sm text-foreground font-semibold">
                       Invoices
                     </TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm">
+                    <TableHead className="text-right text-xs sm:text-sm text-foreground font-semibold">
                       Net
                     </TableHead>
-                    <TableHead className="text-right text-xs sm:text-sm">
+                    <TableHead className="text-right text-xs sm:text-sm text-foreground font-semibold">
                       Gross
                     </TableHead>
                   </TableRow>
@@ -148,18 +154,18 @@ export function AnalyticsTables({
                 <TableBody>
                   {topClients.map(([name, data]) => (
                     <TableRow key={name}>
-                      <TableCell className="font-medium text-xs sm:text-sm">
+                      <TableCell className="font-medium text-xs sm:text-sm text-foreground">
                         {name}
                       </TableCell>
-                      <TableCell className="text-right text-xs sm:text-sm">
+                      <TableCell className="text-right text-xs sm:text-sm text-muted-foreground">
                         {data.count}
                       </TableCell>
-                      <TableCell className="text-right text-xs sm:text-sm whitespace-nowrap">
+                      <TableCell className="text-right text-xs sm:text-sm whitespace-nowrap text-foreground">
                         {isLoading
                           ? '...'
                           : formatCurrency(data.netAmount, displayCurrency)}
                       </TableCell>
-                      <TableCell className="text-right font-semibold text-xs sm:text-sm whitespace-nowrap">
+                      <TableCell className="text-right font-semibold text-xs sm:text-sm whitespace-nowrap text-foreground">
                         {isLoading
                           ? '...'
                           : formatCurrency(data.grossAmount, displayCurrency)}
@@ -170,7 +176,7 @@ export function AnalyticsTables({
               </Table>
             </div>
           ) : (
-            <p className="text-center text-slate-500 py-8 text-sm">
+            <p className="text-center text-muted-foreground py-8 text-sm">
               No paid invoices yet
             </p>
           )}

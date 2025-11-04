@@ -42,7 +42,7 @@ export function ClientSelection({
   isEditing,
 }: ClientSelectionProps) {
   return (
-    <div className="space-y-4 rounded-lg border p-4">
+    <div className="space-y-4 rounded-lg border border-border p-4">
       <div className="flex items-center space-x-2">
         <Checkbox
           id="use-new-client"
@@ -52,7 +52,7 @@ export function ClientSelection({
         />
         <label
           htmlFor="use-new-client"
-          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground"
         >
           Create new client for this invoice
         </label>
@@ -60,7 +60,9 @@ export function ClientSelection({
 
       {!useNewClient ? (
         <div className="space-y-2">
-          <Label htmlFor="client_id">Select Client</Label>
+          <Label htmlFor="client_id" className="text-foreground">
+            Select Client
+          </Label>
           <Select
             name="client_id"
             value={selectedClientId}
@@ -80,7 +82,7 @@ export function ClientSelection({
             </SelectContent>
           </Select>
           {isEditing && (
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Client cannot be changed when editing.
             </p>
           )}
@@ -88,7 +90,9 @@ export function ClientSelection({
       ) : (
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="new_client_name">Client Name</Label>
+            <Label htmlFor="new_client_name" className="text-foreground">
+              Client Name
+            </Label>
             <Input
               id="new_client_name"
               name="new_client_name"
@@ -98,7 +102,7 @@ export function ClientSelection({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="new_client_org_number">
+            <Label htmlFor="new_client_org_number" className="text-foreground">
               Organization Number (Optional)
             </Label>
             <Input
@@ -109,7 +113,9 @@ export function ClientSelection({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="new_client_address">Address</Label>
+            <Label htmlFor="new_client_address" className="text-foreground">
+              Address
+            </Label>
             <Input
               id="new_client_address"
               name="new_client_address"
@@ -119,7 +125,9 @@ export function ClientSelection({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="new_client_country">Country</Label>
+            <Label htmlFor="new_client_country" className="text-foreground">
+              Country
+            </Label>
             <Select
               name="new_client_country"
               value={newClientCountry}
@@ -136,7 +144,7 @@ export function ClientSelection({
                 <SelectItem value="DK">🇩🇰 Denmark</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               VAT is only applied to Norwegian clients when you're MVA
               registered
             </p>

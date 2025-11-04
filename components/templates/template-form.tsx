@@ -86,7 +86,9 @@ export function TemplateForm({
       {/* Basic Info */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="name">Template Name</Label>
+          <Label htmlFor="name" className="text-foreground">
+            Template Name
+          </Label>
           <Input
             id="name"
             name="name"
@@ -98,7 +100,9 @@ export function TemplateForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">Description (Optional)</Label>
+          <Label htmlFor="description" className="text-foreground">
+            Description (Optional)
+          </Label>
           <Textarea
             id="description"
             name="description"
@@ -110,7 +114,9 @@ export function TemplateForm({
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="currency">Currency</Label>
+            <Label htmlFor="currency" className="text-foreground">
+              Currency
+            </Label>
             <Select
               name="currency"
               defaultValue={template?.currency || 'NOK'}
@@ -128,7 +134,9 @@ export function TemplateForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="default_due_days">Default Due Days</Label>
+            <Label htmlFor="default_due_days" className="text-foreground">
+              Default Due Days
+            </Label>
             <Input
               id="default_due_days"
               name="default_due_days"
@@ -148,7 +156,7 @@ export function TemplateForm({
           />
           <label
             htmlFor="is_default"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground"
           >
             Set as default template
           </label>
@@ -158,7 +166,7 @@ export function TemplateForm({
       {/* Line Items */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <Label>Template Line Items</Label>
+          <Label className="text-foreground">Template Line Items</Label>
           <Button type="button" variant="outline" size="sm" onClick={addItem}>
             <Plus className="mr-2 h-4 w-4" />
             Add Item
@@ -166,10 +174,10 @@ export function TemplateForm({
         </div>
 
         {items.map((item, index) => (
-          <Card key={index} className="p-4">
+          <Card key={index} className="p-4 border-border">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Description</Label>
+                <Label className="text-foreground">Description</Label>
                 <Textarea
                   value={item.description}
                   onChange={(e) =>
@@ -183,7 +191,7 @@ export function TemplateForm({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Default Quantity</Label>
+                  <Label className="text-foreground">Default Quantity</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -200,7 +208,7 @@ export function TemplateForm({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Default Unit Price</Label>
+                  <Label className="text-foreground">Default Unit Price</Label>
                   <Input
                     type="number"
                     step="0.01"

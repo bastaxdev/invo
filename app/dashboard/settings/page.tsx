@@ -48,20 +48,20 @@ export default async function SettingsPage({
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
-        <p className="mt-2 text-slate-600">
+        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+        <p className="mt-2 text-muted-foreground">
           Manage your profile and invoice information
         </p>
       </div>
 
       {params.error && (
-        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+        <div className="mb-4 rounded-md bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive">
           {params.error}
         </div>
       )}
 
       {params.success && (
-        <div className="mb-4 rounded-md bg-green-50 p-3 text-sm text-green-800">
+        <div className="mb-4 rounded-md bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-3 text-sm text-green-700 dark:text-green-300">
           Profile updated successfully!
         </div>
       )}
@@ -76,7 +76,9 @@ export default async function SettingsPage({
             <div className="space-y-2">
               <Label>Email</Label>
               <Input value={user.email || ''} disabled />
-              <p className="text-xs text-slate-500">Email cannot be changed</p>
+              <p className="text-xs text-muted-foreground">
+                Email cannot be changed
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -92,13 +94,13 @@ export default async function SettingsPage({
             <LogoUpload currentLogoUrl={profile?.logo_url} userId={user.id} />
 
             {profile?.logo_url && (
-              <div className="flex items-center space-x-2 pt-4 border-t">
+              <div className="flex items-center space-x-2 pt-4 border-t border-border">
                 <input
                   type="checkbox"
                   id="show_logo_on_invoice"
                   name="show_logo_on_invoice"
                   defaultChecked={profile?.show_logo_on_invoice ?? true}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
                   form="profile-form"
                 />
                 <label
@@ -127,7 +129,7 @@ export default async function SettingsPage({
                   id="mva_registered"
                   name="mva_registered"
                   defaultChecked={profile?.mva_registered ?? false}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
                   form="profile-form"
                 />
                 <label
@@ -138,7 +140,7 @@ export default async function SettingsPage({
                 </label>
               </div>
 
-              <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800">
+              <div className="rounded-lg bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-3 text-sm text-blue-800 dark:text-blue-200">
                 <p className="font-semibold mb-1">What is MVA?</p>
                 <p>
                   MVA (Merverdiavgift) is Norwegian VAT. If you earn more than
@@ -165,7 +167,7 @@ export default async function SettingsPage({
                   id="pdf_language_polish"
                   name="pdf_language_polish"
                   defaultChecked={profile?.pdf_language_polish ?? true}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
                   form="profile-form"
                 />
                 <label
@@ -182,7 +184,7 @@ export default async function SettingsPage({
                   id="pdf_language_norwegian"
                   name="pdf_language_norwegian"
                   defaultChecked={profile?.pdf_language_norwegian ?? true}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
                   form="profile-form"
                 />
                 <label
@@ -199,7 +201,7 @@ export default async function SettingsPage({
                   id="pdf_language_english"
                   name="pdf_language_english"
                   defaultChecked={profile?.pdf_language_english ?? false}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
                   form="profile-form"
                 />
                 <label
@@ -210,13 +212,14 @@ export default async function SettingsPage({
                 </label>
               </div>
 
-              <p className="text-xs text-slate-500 pt-2">
+              <p className="text-xs text-muted-foreground pt-2">
                 Select at least one language. Your invoices will include all
                 selected languages.
               </p>
             </div>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Business Information</CardTitle>
@@ -235,7 +238,7 @@ export default async function SettingsPage({
                   <Label htmlFor="full_name">
                     Full Name{' '}
                     {!profile?.business_name && (
-                      <span className="text-red-500">*</span>
+                      <span className="text-destructive">*</span>
                     )}
                   </Label>
                   <Input
@@ -246,7 +249,7 @@ export default async function SettingsPage({
                     defaultValue={profile?.full_name || ''}
                     required={!profile?.business_name}
                   />
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Required if Business Name is not provided
                   </p>
                 </div>
@@ -254,7 +257,7 @@ export default async function SettingsPage({
                   <Label htmlFor="business_name">
                     Business Name{' '}
                     {!profile?.full_name && (
-                      <span className="text-red-500">*</span>
+                      <span className="text-destructive">*</span>
                     )}
                   </Label>
                   <Input
@@ -265,13 +268,13 @@ export default async function SettingsPage({
                     defaultValue={profile?.business_name || ''}
                     required={!profile?.full_name}
                   />
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     Required if Full Name is not provided
                   </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="invoice_prefix">
-                    Invoice Prefix <span className="text-red-500">*</span>
+                    Invoice Prefix <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="invoice_prefix"
@@ -284,7 +287,7 @@ export default async function SettingsPage({
                     className="uppercase"
                     required
                   />
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     2-6 characters, letters and numbers only. Used for invoice
                     numbers (e.g., INVO-001, INVO-002)
                   </p>
@@ -306,7 +309,7 @@ export default async function SettingsPage({
                       <SelectItem value="EUR">EUR (Euro)</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     All analytics will be converted to this currency
                   </p>
                 </div>
@@ -339,7 +342,7 @@ export default async function SettingsPage({
 
               <div className="space-y-2">
                 <Label htmlFor="phone">
-                  Phone Number <span className="text-red-500">*</span>
+                  Phone Number <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="phone"
@@ -349,14 +352,14 @@ export default async function SettingsPage({
                   defaultValue={profile?.phone || ''}
                   required
                 />
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   Include country code (e.g., +48 for Poland, +47 for Norway)
                 </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="address">
-                  Address <span className="text-red-500">*</span>
+                  Address <span className="text-destructive">*</span>
                 </Label>
                 <Textarea
                   id="address"
@@ -368,14 +371,16 @@ export default async function SettingsPage({
                 />
               </div>
 
-              <div className="border-t pt-4">
-                <h3 className="mb-4 text-lg font-semibold">Bank Details</h3>
+              <div className="border-t border-border pt-4">
+                <h3 className="mb-4 text-lg font-semibold text-foreground">
+                  Bank Details
+                </h3>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="bank_account">
                       Bank Account / IBAN{' '}
-                      <span className="text-red-500">*</span>
+                      <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="bank_account"
@@ -385,7 +390,7 @@ export default async function SettingsPage({
                       defaultValue={profile?.bank_account || ''}
                       required
                     />
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-muted-foreground">
                       IBAN format recommended
                     </p>
                   </div>
@@ -393,7 +398,7 @@ export default async function SettingsPage({
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="bank_name">
-                        Bank Name <span className="text-red-500">*</span>
+                        Bank Name <span className="text-destructive">*</span>
                       </Label>
                       <Input
                         id="bank_name"
@@ -406,7 +411,8 @@ export default async function SettingsPage({
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="swift_bic">
-                        SWIFT/BIC Code <span className="text-red-500">*</span>
+                        SWIFT/BIC Code{' '}
+                        <span className="text-destructive">*</span>
                       </Label>
                       <Input
                         id="swift_bic"
@@ -421,7 +427,7 @@ export default async function SettingsPage({
 
                   <div className="space-y-2">
                     <Label htmlFor="bank_address">
-                      Bank Address <span className="text-red-500">*</span>
+                      Bank Address <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="bank_address"

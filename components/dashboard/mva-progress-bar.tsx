@@ -26,92 +26,93 @@ export function MVAProgressBar({
   const hasExceeded = revenueNOK >= MVA_LIMIT
 
   return (
-    <Card
-      className={
-        isApproachingLimit && !mvaRegistered
-          ? 'border-orange-300 bg-orange-50'
-          : ''
-      }
-    >
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              {mvaRegistered ? (
-                <>
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  MVA Status
-                </>
-              ) : (
-                <>
-                  {isApproachingLimit && (
-                    <AlertCircle className="h-5 w-5 text-orange-600" />
-                  )}
-                  MVA Registration Tracker
-                </>
+    <Card className="border-border">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-foreground">
+          {mvaRegistered ? (
+            <>
+              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+              MVA Status
+            </>
+          ) : (
+            <>
+              {isApproachingLimit && (
+                <AlertCircle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               )}
-            </CardTitle>
-            <CardDescription>
-              {mvaRegistered
-                ? 'You are registered for Norwegian MVA'
-                : hasExceeded
-                ? 'You have exceeded the 50,000 NOK limit'
-                : 'Norwegian VAT registration required at 50,000 NOK'}
-            </CardDescription>
-          </div>
-          <div className="text-right">
-            <div className="text-2xl font-bold text-slate-900">
+              MVA Registration Tracker
+            </>
+          )}
+        </CardTitle>
+        <CardDescription className="text-muted-foreground">
+          {mvaRegistered
+            ? 'You are registered for Norwegian MVA'
+            : hasExceeded
+            ? 'You have exceeded the 50,000 NOK limit'
+            : 'Norwegian VAT registration required at 50,000 NOK'}
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="space-y-3">
+        <div className="flex items-baseline justify-between">
+          <div>
+            <div className="text-2xl font-bold text-foreground">
               {revenueNOK.toLocaleString('nb-NO', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0,
               })}
             </div>
-            <div className="text-sm text-slate-600">NOK (last 12 months)</div>
+            <div className="text-sm text-muted-foreground">
+              NOK (last 12 months)
+            </div>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
+
         {!mvaRegistered && (
           <>
-            <div className="mb-2 flex justify-between text-sm">
-              <span className="text-slate-600">Progress to limit</span>
-              <span className="font-semibold text-slate-900">
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-muted-foreground">
+                Progress to limit
+              </span>
+              <span className="text-sm font-bold text-foreground">
                 {percentage.toFixed(1)}%
               </span>
             </div>
-            <div className="h-3 w-full overflow-hidden rounded-full bg-slate-200">
+
+            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
               <div
-                className={`h-full transition-all duration-500 ${
+                className={`h-full transition-all ${
                   hasExceeded
-                    ? 'bg-red-600'
+                    ? 'bg-red-600 dark:bg-red-500'
                     : isApproachingLimit
-                    ? 'bg-orange-500'
-                    : 'bg-blue-600'
+                    ? 'bg-orange-600 dark:bg-orange-500'
+                    : 'bg-blue-600 dark:bg-blue-500'
                 }`}
                 style={{ width: `${percentage}%` }}
               />
             </div>
-            <div className="mt-2 text-sm text-slate-600">
+
+            <p className="text-sm text-muted-foreground">
               {hasExceeded ? (
-                <span className="font-semibold text-red-600">
+                <span className="font-semibold text-red-600 dark:text-red-400">
                   ⚠️ You must register for MVA immediately
                 </span>
               ) : (
-                <span>
+                <>
                   {remaining.toLocaleString('nb-NO', {
                     minimumFractionDigits: 0,
                   })}{' '}
                   NOK remaining before registration required
-                </span>
+                </>
               )}
-            </div>
+            </p>
           </>
         )}
+
         {mvaRegistered && (
-          <div className="rounded-lg bg-green-100 p-3 text-sm text-green-800">
+          <p className="text-sm text-muted-foreground">
             ✓ You are compliant with Norwegian MVA regulations. Remember to
             charge 25% VAT on invoices to Norwegian customers.
-          </div>
+          </p>
         )}
       </CardContent>
     </Card>

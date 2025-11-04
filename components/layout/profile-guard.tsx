@@ -37,24 +37,24 @@ export async function ProfileGuard({
     if (!profile?.invoice_prefix) missingFields.push('Invoice Prefix')
 
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="rounded-lg border-2 border-yellow-400 bg-yellow-50 p-8 text-center">
+          <div className="rounded-lg border-2 border-yellow-400 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-950 p-8 text-center">
             <div className="mb-4 text-6xl">⚠️</div>
-            <h2 className="mb-4 text-2xl font-bold text-slate-900">
+            <h2 className="mb-4 text-2xl font-bold text-foreground">
               Complete Your Profile First
             </h2>
-            <p className="mb-6 text-slate-700">
+            <p className="mb-6 text-card-foreground">
               Before creating invoices, you need to complete your profile
               information. This information will appear on your generated
               invoices.
             </p>
-            <p className="mb-8 text-sm text-slate-600">
+            <p className="mb-8 text-sm text-muted-foreground">
               Missing: {missingFields.join(', ')}
             </p>
             <a
               href="/dashboard/settings"
-              className="inline-block rounded-md bg-slate-900 px-6 py-3 text-white hover:bg-slate-800"
+              className="inline-block rounded-md bg-primary text-primary-foreground px-6 py-3 hover:bg-primary/90 transition-colors"
             >
               Complete Profile Now
             </a>

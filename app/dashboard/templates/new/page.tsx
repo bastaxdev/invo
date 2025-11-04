@@ -26,7 +26,9 @@ export default async function NewTemplatePage() {
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <Card>
         <CardHeader>
-          <CardTitle>Create Invoice Template</CardTitle>
+          <CardTitle className="text-foreground">
+            Create Invoice Template
+          </CardTitle>
           <CardDescription>
             Create a reusable template for faster invoicing
           </CardDescription>

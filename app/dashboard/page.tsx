@@ -1,3 +1,4 @@
+// app/dashboard/page.tsx
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
@@ -73,10 +74,10 @@ export default async function DashboardPage() {
 
       {/* Header */}
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
           Dashboard
         </h1>
-        <p className="mt-1 sm:mt-2 text-sm sm:text-base text-slate-600 truncate">
+        <p className="mt-1 sm:mt-2 text-sm sm:text-base text-muted-foreground truncate">
           Welcome back, {displayName}
         </p>
       </div>
@@ -93,8 +94,10 @@ export default async function DashboardPage() {
         {/* Clients Card */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg sm:text-xl">Clients</CardTitle>
-            <CardDescription className="text-sm">
+            <CardTitle className="text-lg sm:text-xl text-foreground">
+              Clients
+            </CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
               {clients?.length || 0} client{clients?.length !== 1 ? 's' : ''}
             </CardDescription>
           </CardHeader>
@@ -110,8 +113,10 @@ export default async function DashboardPage() {
         {/* Invoices Card */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg sm:text-xl">Invoices</CardTitle>
-            <CardDescription className="text-sm">
+            <CardTitle className="text-lg sm:text-xl text-foreground">
+              Invoices
+            </CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
               {invoices?.length || 0} invoice{invoices?.length !== 1 ? 's' : ''}
             </CardDescription>
           </CardHeader>
@@ -127,8 +132,10 @@ export default async function DashboardPage() {
         {/* Templates Card */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg sm:text-xl">Templates</CardTitle>
-            <CardDescription className="text-sm">
+            <CardTitle className="text-lg sm:text-xl text-foreground">
+              Templates
+            </CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
               {templates?.length || 0} template
               {templates?.length !== 1 ? 's' : ''}
             </CardDescription>
@@ -145,8 +152,10 @@ export default async function DashboardPage() {
         {/* Analytics Card */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg sm:text-xl">Analytics</CardTitle>
-            <CardDescription className="text-sm">
+            <CardTitle className="text-lg sm:text-xl text-foreground">
+              Analytics
+            </CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
               Total:{' '}
               {totalRevenue.toLocaleString('nb-NO', {
                 minimumFractionDigits: 2,
