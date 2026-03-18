@@ -20,6 +20,7 @@ interface LineItemInput {
   description: string
   quantity: number
   unit_price: number
+  amount: number
 }
 
 async function getUserPrefix(supabase: DbClient, userId: string): Promise<string> {
