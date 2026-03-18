@@ -5,8 +5,24 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@/lib/supabase/server'
 import { calculateLast12MonthsRevenueNOK } from '@/app/actions/mva'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
-async function getUserPrefix(supabase: any, userId: string): Promise<string> {
+type DbClient = SupabaseClient
+
+const FALLBACK_RATES: Record<string, number> = {
+  NOK: 1,
+  PLN: 0.42,
+  EUR: 11.5,
+  USD: 10.5,
+}
+
+interface LineItemInput {
+  description: string
+  quantity: number
+  unit_price: number
+}
+
+async function getUserPrefix(supabase: DbClient, userId: string): Promise<string> {
   const { data: profile } = await supabase
     .from('user_profiles')
     .select('invoice_prefix')
@@ -23,7 +39,7 @@ async function getUserPrefix(supabase: any, userId: string): Promise<string> {
 }
 
 async function generateInvoiceNumber(
-  supabase: any,
+  supabase: DbClient,
   userId: string
 ): Promise<string> {
   const prefix = await getUserPrefix(supabase, userId)
@@ -39,7 +55,7 @@ async function generateInvoiceNumber(
   }
 
   const numbers = invoices
-    .map((inv: any) => {
+    .map((inv: { invoice_number: string }) => {
       const match = inv.invoice_number.match(new RegExp(`${prefix}-(\\d+)`))
       return match ? parseInt(match[1]) : 0
     })
@@ -56,7 +72,7 @@ async function generateInvoiceNumber(
 }
 
 async function isInvoiceNumberUnique(
-  supabase: any,
+  supabase: DbClient,
   userId: string,
   invoiceNumber: string,
   excludeInvoiceId?: string
@@ -77,7 +93,7 @@ async function isInvoiceNumberUnique(
 }
 
 async function calculateInvoiceVAT(
-  supabase: any,
+  supabase: DbClient,
   userId: string,
   clientCountry: string,
   invoiceAmountNOK: number
@@ -247,13 +263,7 @@ export async function createInvoice(formData: FormData) {
   const currency = formData.get('currency') as string
 
   // Convert invoice amount to NOK for threshold check
-  const EXCHANGE_RATES: { [key: string]: number } = {
-    NOK: 1,
-    PLN: 0.42,
-    EUR: 11.5,
-    USD: 10.5,
-  }
-  const invoiceAmountNOK = subtotal * (EXCHANGE_RATES[currency] || 1)
+  const invoiceAmountNOK = subtotal * (FALLBACK_RATES[currency] || 1)
 
   // Calculate VAT based on CURRENT settings at time of creation
   const vatCalc = await calculateInvoiceVAT(
@@ -297,7 +307,7 @@ export async function createInvoice(formData: FormData) {
   const itemsJson = formData.get('items') as string
   if (itemsJson) {
     const items = JSON.parse(itemsJson)
-    const lineItems = items.map((item: any, index: number) => ({
+    const lineItems = items.map((item: LineItemInput, index: number) => ({
       invoice_id: invoice.id,
       description: item.description,
       quantity: item.quantity,
@@ -397,13 +407,7 @@ export async function updateInvoice(id: string, formData: FormData) {
   const currency = formData.get('currency') as string
 
   // Convert to NOK for threshold check
-  const EXCHANGE_RATES: { [key: string]: number } = {
-    NOK: 1,
-    PLN: 0.42,
-    EUR: 11.5,
-    USD: 10.5,
-  }
-  const invoiceAmountNOK = subtotal * (EXCHANGE_RATES[currency] || 1)
+  const invoiceAmountNOK = subtotal * (FALLBACK_RATES[currency] || 1)
 
   // Calculate VAT based on CURRENT settings at time of update
   const vatCalc = await calculateInvoiceVAT(
@@ -447,7 +451,7 @@ export async function updateInvoice(id: string, formData: FormData) {
   const itemsJson = formData.get('items') as string
   if (itemsJson) {
     const items = JSON.parse(itemsJson)
-    const lineItems = items.map((item: any, index: number) => ({
+    const lineItems = items.map((item: LineItemInput, index: number) => ({
       invoice_id: id,
       description: item.description,
       quantity: item.quantity,

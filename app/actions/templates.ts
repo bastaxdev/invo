@@ -5,6 +5,12 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@/lib/supabase/server'
 
+interface TemplateItemInput {
+  description: string
+  quantity: number
+  unit_price: number
+}
+
 export async function createTemplate(formData: FormData) {
   const supabase = await createSupabaseClient()
 
@@ -47,7 +53,7 @@ export async function createTemplate(formData: FormData) {
   const itemsJson = formData.get('items') as string
   if (itemsJson) {
     const items = JSON.parse(itemsJson)
-    const templateItems = items.map((item: any, index: number) => ({
+    const templateItems = items.map((item: TemplateItemInput, index: number) => ({
       template_id: template.id,
       description: item.description,
       quantity: item.quantity,
@@ -107,7 +113,7 @@ export async function updateTemplate(id: string, formData: FormData) {
   const itemsJson = formData.get('items') as string
   if (itemsJson) {
     const items = JSON.parse(itemsJson)
-    const templateItems = items.map((item: any, index: number) => ({
+    const templateItems = items.map((item: TemplateItemInput, index: number) => ({
       template_id: id,
       description: item.description,
       quantity: item.quantity,
