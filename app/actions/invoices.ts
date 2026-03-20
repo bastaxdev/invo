@@ -44,6 +44,7 @@ async function generateInvoiceNumber(
   userId: string
 ): Promise<string> {
   const prefix = await getUserPrefix(supabase, userId)
+  const year = new Date().getFullYear()
 
   const { data: invoices } = await supabase
     .from('invoices')
@@ -52,24 +53,24 @@ async function generateInvoiceNumber(
     .order('created_at', { ascending: false })
 
   if (!invoices || invoices.length === 0) {
-    return `${prefix}-001`
+    return `${prefix}/${year}/001`
   }
 
   const numbers = invoices
     .map((inv: { invoice_number: string }) => {
-      const match = inv.invoice_number.match(new RegExp(`${prefix}-(\\d+)`))
+      const match = inv.invoice_number.match(new RegExp(`^${prefix}/${year}/(\\d+)$`))
       return match ? parseInt(match[1]) : 0
     })
     .filter((num: number) => num > 0)
 
   if (numbers.length === 0) {
-    return `${prefix}-001`
+    return `${prefix}/${year}/001`
   }
 
   const maxNumber = Math.max(...numbers)
   const nextNumber = maxNumber + 1
 
-  return `${prefix}-${nextNumber.toString().padStart(3, '0')}`
+  return `${prefix}/${year}/${nextNumber.toString().padStart(3, '0')}`
 }
 
 async function isInvoiceNumberUnique(
@@ -229,22 +230,23 @@ export async function createInvoice(formData: FormData) {
 
   if (!invoiceNumber || invoiceNumber === '') {
     invoiceNumber = await generateInvoiceNumber(supabase, user.id)
+    const year = new Date().getFullYear()
 
     while (!(await isInvoiceNumberUnique(supabase, user.id, invoiceNumber))) {
-      const match = invoiceNumber.match(new RegExp(`${prefix}-(\\d+)`))
+      const match = invoiceNumber.match(new RegExp(`${prefix}/${year}/(\\d+)`))
       if (match) {
         const num = parseInt(match[1]) + 1
-        invoiceNumber = `${prefix}-${num.toString().padStart(3, '0')}`
+        invoiceNumber = `${prefix}/${year}/${num.toString().padStart(3, '0')}`
       } else {
-        invoiceNumber = `${prefix}-001`
+        invoiceNumber = `${prefix}/${year}/001`
       }
     }
   } else {
-    if (!invoiceNumber.startsWith(`${prefix}-`)) {
+    if (!invoiceNumber.startsWith(`${prefix}/`)) {
       redirect(
         '/dashboard/invoices/new?error=' +
           encodeURIComponent(
-            `Invoice number must start with your prefix: ${prefix}-`
+            `Invoice number must start with your prefix: ${prefix}/`
           )
       )
     }
@@ -385,11 +387,11 @@ export async function updateInvoice(id: string, formData: FormData) {
     redirect(`/dashboard/invoices/${id}/edit?error=Invoice number is required`)
   }
 
-  if (!invoiceNumber.startsWith(`${prefix}-`)) {
+  if (!invoiceNumber.startsWith(`${prefix}/`)) {
     redirect(
       `/dashboard/invoices/${id}/edit?error=` +
         encodeURIComponent(
-          `Invoice number must start with your prefix: ${prefix}-`
+          `Invoice number must start with your prefix: ${prefix}/`
         )
     )
   }
