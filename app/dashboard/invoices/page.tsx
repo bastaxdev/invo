@@ -149,7 +149,7 @@ export default async function InvoicesPage({
                           <span className="text-muted-foreground">
                             VAT ({vatRate}%)
                           </span>
-                          <span className="font-medium text-green-600 dark:text-green-400">
+                          <span className="font-medium text-foreground">
                             {vatAmount.toLocaleString('nb-NO', {
                               minimumFractionDigits: 2,
                               maximumFractionDigits: 2,
@@ -244,7 +244,7 @@ export default async function InvoicesPage({
                       </TableCell>
                       <TableCell>
                         {vatRate > 0 ? (
-                          <span className="text-green-600 dark:text-green-400 font-medium">
+                          <span className="font-medium text-foreground">
                             {vatRate}% (
                             {vatAmount.toLocaleString('nb-NO', {
                               minimumFractionDigits: 2,

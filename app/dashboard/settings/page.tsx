@@ -140,7 +140,7 @@ export default async function SettingsPage({
                 </label>
               </div>
 
-              <div className="rounded-lg bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 p-3 text-sm text-blue-800 dark:text-blue-200">
+              <div className="rounded-lg bg-muted border border-border p-3 text-sm text-muted-foreground">
                 <p className="font-semibold mb-1">What is MVA?</p>
                 <p>
                   MVA (Merverdiavgift) is Norwegian VAT. If you earn more than

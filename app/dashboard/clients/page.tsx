@@ -138,7 +138,7 @@ export default async function ClientsPage({
                           <p className="text-xs text-muted-foreground">Email</p>
                           <a
                             href={`mailto:${client.email}`}
-                            className="font-medium text-primary hover:underline"
+                            className="font-medium text-foreground"
                           >
                             {client.email}
                           </a>
@@ -153,7 +153,7 @@ export default async function ClientsPage({
                           <p className="text-xs text-muted-foreground">Phone</p>
                           <a
                             href={`tel:${client.phone}`}
-                            className="font-medium text-primary hover:underline"
+                            className="font-medium text-foreground"
                           >
                             {client.phone}
                           </a>
@@ -221,7 +221,7 @@ export default async function ClientsPage({
                             <Mail className="h-3.5 w-3.5 text-muted-foreground" />
                             <a
                               href={`mailto:${client.email}`}
-                              className="text-primary hover:underline"
+                              className="text-foreground"
                             >
                               {client.email}
                             </a>
@@ -232,7 +232,7 @@ export default async function ClientsPage({
                             <Phone className="h-3.5 w-3.5 text-muted-foreground" />
                             <a
                               href={`tel:${client.phone}`}
-                              className="text-primary hover:underline"
+                              className="text-foreground"
                             >
                               {client.phone}
                             </a>

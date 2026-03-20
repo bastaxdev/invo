@@ -56,14 +56,14 @@ export function VATAlertBanners({
 
       {/* Export Banner */}
       {mvaRegistered && !shouldApplyVAT && clientCountry !== 'NO' && (
-        <div className="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 p-4">
+        <div className="rounded-lg border border-border bg-muted/50 p-4">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-muted-foreground mt-0.5" />
             <div>
-              <h3 className="font-semibold text-blue-900 dark:text-blue-200">
+              <h3 className="font-semibold text-foreground">
                 Export - 0% VAT
               </h3>
-              <p className="text-sm text-blue-800 dark:text-blue-300 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 This is an export sale (non-Norwegian client). VAT rate: 0%
                 (zero-rated export).
               </p>

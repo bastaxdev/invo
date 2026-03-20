@@ -104,10 +104,10 @@ export function MVARegistrationPopup({
           </div>
 
           {/* Compact help section */}
-          <details className="group rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950">
-            <summary className="cursor-pointer list-none p-3 font-semibold text-blue-900 dark:text-blue-200 text-sm flex items-center justify-between">
+          <details className="group rounded-lg border border-border bg-muted/50">
+            <summary className="cursor-pointer list-none p-3 font-semibold text-foreground text-sm flex items-center justify-between">
               <span>Need help with registration?</span>
-              <span className="text-xs text-blue-600 dark:text-blue-400 group-open:hidden">
+              <span className="text-xs text-muted-foreground group-open:hidden">
                 Click to expand
               </span>
             </summary>
