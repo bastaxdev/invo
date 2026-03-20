@@ -64,7 +64,7 @@ export default async function DashboardPage() {
     return due < today && inv.status !== 'paid' && inv.status !== 'draft'
   })
 
-  const [paidRevenue, outstanding, overdueAmount] = await Promise.all([
+  const [paidRevenue, pendingAmount, overdueAmount] = await Promise.all([
     convertAndSum(
       paidInvoices.map((inv) => ({
         amount: inv.amount_with_vat || inv.amount,
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
       defaultCurrency
     ),
     convertAndSum(
-      [...sentInvoices, ...overdueList].map((inv) => ({
+      sentInvoices.map((inv) => ({
         amount: inv.amount_with_vat || inv.amount,
         currency: inv.currency,
       })),
@@ -137,7 +137,7 @@ export default async function DashboardPage() {
       )}
 
       {/* KPI Cards */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -146,11 +146,11 @@ export default async function DashboardPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {fmt(paidRevenue)} {defaultCurrency}
+            <div className="text-2xl sm:text-3xl font-bold tabular-nums">
+              {fmt(paidRevenue)} <span className="text-base font-medium text-muted-foreground">{defaultCurrency}</span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {paidInvoices.length} paid invoice{paidInvoices.length !== 1 ? 's' : ''}
+              {paidInvoices.length} paid
             </p>
           </CardContent>
         </Card>
@@ -158,16 +158,16 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Outstanding
+              Pending
             </CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {fmt(outstanding)} {defaultCurrency}
+            <div className="text-2xl sm:text-3xl font-bold tabular-nums">
+              {fmt(pendingAmount)} <span className="text-base font-medium text-muted-foreground">{defaultCurrency}</span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {sentInvoices.length + overdueList.length} unpaid invoice{sentInvoices.length + overdueList.length !== 1 ? 's' : ''}
+              {sentInvoices.length} awaiting payment
             </p>
           </CardContent>
         </Card>
@@ -180,11 +180,11 @@ export default async function DashboardPage() {
             <AlertCircle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${overdueList.length > 0 ? 'text-destructive' : ''}`}>
-              {fmt(overdueAmount)} {defaultCurrency}
+            <div className={`text-2xl sm:text-3xl font-bold tabular-nums ${overdueList.length > 0 ? 'text-destructive' : ''}`}>
+              {fmt(overdueAmount)} <span className="text-base font-medium text-muted-foreground">{defaultCurrency}</span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {overdueList.length} overdue invoice{overdueList.length !== 1 ? 's' : ''}
+              {overdueList.length} past due
             </p>
           </CardContent>
         </Card>
@@ -192,14 +192,16 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              All Invoices
+              Clients
             </CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{allInvoices.length}</div>
+            <div className="text-2xl sm:text-3xl font-bold tabular-nums">
+              {clients?.length || 0}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {clients?.length || 0} client{clients?.length !== 1 ? 's' : ''}
+              {allInvoices.length} invoice{allInvoices.length !== 1 ? 's' : ''} total
             </p>
           </CardContent>
         </Card>
