@@ -25,6 +25,8 @@ export default async function InvoiceViewPage({
     redirect('/login')
   }
 
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+
   const { data: invoice } = await supabase
     .from('invoices')
     .select(
@@ -39,7 +41,7 @@ export default async function InvoiceViewPage({
       )
     `
     )
-    .eq('id', id)
+    .eq(isUUID ? 'id' : 'invoice_number', isUUID ? id : id.replace(/-/g, '/'))
     .eq('user_id', user.id)
     .single()
 
@@ -50,7 +52,7 @@ export default async function InvoiceViewPage({
   const { data: invoiceItems } = await supabase
     .from('invoice_items')
     .select('*')
-    .eq('invoice_id', id)
+    .eq('invoice_id', invoice.id)
     .order('sort_order')
 
   const { data: userProfile } = await supabase
@@ -241,7 +243,7 @@ export default async function InvoiceViewPage({
       </div>
 
       <div className="mt-8 flex gap-4">
-        <Link href={`/dashboard/invoices/${invoice.id}/edit`}>
+        <Link href={`/dashboard/invoices/${invoice.invoice_number.replace(/\//g, '-')}/edit`}>
           <Button variant="outline">Edit Invoice</Button>
         </Link>
         <Link href="/dashboard/invoices">

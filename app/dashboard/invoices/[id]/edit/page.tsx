@@ -24,11 +24,13 @@ export default async function EditInvoicePage({
     redirect('/login')
   }
 
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+
   // Fetch the invoice
   const { data: invoice } = await supabase
     .from('invoices')
     .select('*')
-    .eq('id', id)
+    .eq(isUUID ? 'id' : 'invoice_number', isUUID ? id : id.replace(/-/g, '/'))
     .eq('user_id', user.id)
     .single()
 
@@ -40,7 +42,7 @@ export default async function EditInvoicePage({
   const { data: invoiceItems } = await supabase
     .from('invoice_items')
     .select('*')
-    .eq('invoice_id', id)
+    .eq('invoice_id', invoice.id)
     .order('sort_order', { ascending: true })
 
   // Fetch clients
@@ -79,7 +81,7 @@ export default async function EditInvoicePage({
         clients={clients || []}
         invoice={invoice}
         invoiceItems={invoiceItems || []}
-        action={updateInvoice.bind(null, id)}
+        action={updateInvoice.bind(null, invoice.id)}
         mvaRegistered={mvaRegistered}
         revenueExceeded={revenueExceeded}
       />

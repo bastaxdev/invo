@@ -177,7 +177,7 @@ export default async function InvoicesPage({
                     {/* Action Buttons */}
                     <div className="flex gap-2 pt-3 border-t border-border">
                       <Link
-                        href={`/dashboard/invoices/${invoice.id}`}
+                        href={`/dashboard/invoices/${invoice.invoice_number.replace(/\//g, '-')}`}
                         className="flex-1"
                       >
                         <Button variant="outline" size="sm" className="w-full">
@@ -185,7 +185,7 @@ export default async function InvoicesPage({
                         </Button>
                       </Link>
                       <Link
-                        href={`/dashboard/invoices/${invoice.id}/edit`}
+                        href={`/dashboard/invoices/${invoice.invoice_number.replace(/\//g, '-')}/edit`}
                         className="flex-1"
                       >
                         <Button variant="outline" size="sm" className="w-full">
@@ -268,12 +268,12 @@ export default async function InvoicesPage({
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Link href={`/dashboard/invoices/${invoice.id}`}>
+                          <Link href={`/dashboard/invoices/${invoice.invoice_number.replace(/\//g, '-')}`}>
                             <Button variant="outline" size="sm">
                               View
                             </Button>
                           </Link>
-                          <Link href={`/dashboard/invoices/${invoice.id}/edit`}>
+                          <Link href={`/dashboard/invoices/${invoice.invoice_number.replace(/\//g, '-')}/edit`}>
                             <Button variant="outline" size="sm">
                               Edit
                             </Button>

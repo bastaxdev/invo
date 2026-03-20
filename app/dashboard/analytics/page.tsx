@@ -221,7 +221,7 @@ export default async function AnalyticsPage({
                       <TableRow key={invoice.id} className="border-border">
                         <TableCell className="font-medium text-foreground">
                           <Link
-                            href={`/dashboard/invoices/${invoice.id}`}
+                            href={`/dashboard/invoices/${invoice.invoice_number.replace(/\//g, '-')}`}
                             className="text-primary hover:underline"
                           >
                             {invoice.invoice_number}

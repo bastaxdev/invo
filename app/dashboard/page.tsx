@@ -231,7 +231,7 @@ export default async function DashboardPage() {
                   {recentInvoices.map((inv) => (
                     <Link
                       key={inv.id}
-                      href={`/dashboard/invoices/${inv.id}`}
+                      href={`/dashboard/invoices/${inv.invoice_number.replace(/\//g, '-')}`}
                       className="flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
                     >
                       <div className="min-w-0">
