@@ -126,7 +126,7 @@ export async function sendInvoiceEmail(
       userProfile?.business_name || userProfile?.full_name || user.email || ''
 
     const { data, error } = await resend.emails.send({
-      from: `Invo <onboarding@resend.dev>`,
+      from: `Invo <noreply@getinvo.app>`,
       to: recipientEmail,
       subject: lang.subject(invoice.invoice_number, sellerName),
       html: `
